@@ -1,131 +1,137 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id"> 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KORWIL SINE</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://github.com/yorian99/yor-iapp/blob/main/favicon.png?raw=true" type="image/png">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        /* Animasi kucing berjalan dengan efek memantul (bobbing) */
-        @keyframes cat-walk {
-            0% { transform: translateX(-80px) translateY(0) scaleX(1); }
-            25% { transform: translateX(-40px) translateY(-10px) scaleX(1); }
-            50% { transform: translateX(0px) translateY(0) scaleX(1); }
-            75% { transform: translateX(40px) translateY(-10px) scaleX(1); }
-            99% { transform: translateX(80px) translateY(0) scaleX(1); }
-            100% { transform: translateX(80px) translateY(0) scaleX(-1); }
-        }
-
-        @keyframes cat-walk-back {
-            0% { transform: translateX(80px) translateY(0) scaleX(-1); }
-            25% { transform: translateX(40px) translateY(-10px) scaleX(-1); }
-            50% { transform: translateX(0px) translateY(0) scaleX(-1); }
-            75% { transform: translateX(-40px) translateY(-10px) scaleX(-1); }
-            99% { transform: translateX(-80px) translateY(0) scaleX(-1); }
-            100% { transform: translateX(-80px) translateY(0) scaleX(1); }
-        }
-
-        .animate-funny-walk {
-            display: inline-block;
-            animation: cat-walk 4s infinite alternate ease-in-out;
-        }
-
-        /* Gaya tulisan tangan untuk kesan tidak kaku */
-        @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap');
-        
         body {
-            font-family: 'Quicksand', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f1f5f9;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
         }
 
-        .shadow-soft {
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+        .app-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .app-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
         }
     </style>
 </head>
-<body class="bg-[#fdf6e3] min-h-screen flex items-center justify-center p-6 text-[#5d5747]">
+<body class="text-slate-800 flex flex-col min-h-screen">
 
-    <div class="max-w-sm w-full bg-white rounded-[2.5rem] shadow-soft border-4 border-[#eee8d5] overflow-hidden p-8 text-center relative">
+    <!-- Header Section -->
+    <header class="hero-gradient text-white pt-12 pb-24 px-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
+            <i class="fa-solid fa-graduation-cap text-[200px]"></i>
+        </div>
         
-        <!-- Header Lucu -->
-        <div class="mb-6">
-            <h1 id="quoteTitle" class="text-2xl font-bold text-[#b58900] mb-1 transition-all duration-500">
-                Lagi Rehat?
-            </h1>
-            <p id="quoteSubtitle" class="text-xs font-medium text-[#93a1a1] uppercase tracking-[0.2em] transition-all duration-500">
-                ISTIRAHAT BENTAR, LANJUT LAGI NANTI
+        <div class="max-w-5xl mx-auto flex flex-col items-center text-center relative z-10">
+            <img src="https://github.com/yorian99/yor-iapp/blob/main/favicon.png?raw=true" alt="Logo" class="w-20 h-20 mb-6 drop-shadow-lg">
+            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight">Portal KORWIL SINE</h1>
+            <p class="text-slate-300 text-lg md:text-xl max-w-2xl font-light">
+                Akses terpadu untuk pelaksanaan Penilaian dan Assessment Akhir Semester di lingkungan wilayah Sine.
             </p>
         </div>
+    </header>
 
-        <!-- Jam & Tanggal -->
-        <div class="bg-[#eee8d5]/30 rounded-3xl py-6 mb-8 border-2 border-dashed border-[#dcd6c3]">
-            <div id="timeDisplay" class="text-5xl font-black text-[#586e75] tracking-tighter mb-1">
-                00:00
-            </div>
-            <div id="dateDisplay" class="text-sm font-bold text-[#839496]">
-                ---
-            </div>
-        </div>
-
-        <!-- Jalur Kucing Berjalan -->
-        <div class="relative h-24 flex items-center justify-center border-b-2 border-[#eee8d5] mb-4">
-            <div id="catContainer" class="animate-funny-walk">
-                <span id="catEmoji" class="text-6xl cursor-default select-none">🐈</span>
-            </div>
-        </div>
-
-        <!-- Teks Bawah -->
-        <p class="text-[10px] text-[#93a1a1] italic mt-2">Kucing ini setia menemanimu bekerja...</p>
-
-    </div>
-
-    <script>
-        // --- JAM REAL-TIME ---
-        function updateClock() {
-            const now = new Date();
-            const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-            const dateOptions = { weekday: 'long', day: 'numeric', month: 'short' };
-
-            document.getElementById('timeDisplay').textContent = now.toLocaleTimeString('id-ID', timeOptions).replace(/\./g, ':');
-            document.getElementById('dateDisplay').textContent = now.toLocaleDateString('id-ID', dateOptions);
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // --- MOTIVASI YANG GAK KAKU ---
-        const quotes = [
-            { title: "Semangat Ya!", sub: "KERJA TERUS, KAPAN KAYA? EH." },
-            { title: "Pelan-pelan Saja", sub: "YANG PENTING GAK BERHENTI" },
-            { title: "Keren Banget!", sub: "KAMU SUDAH BERUSAHA HARI INI" },
-            { title: "Napas Dulu...", sub: "JANGAN LUPA MINUM AIR PUTIH" },
-            { title: "Gas Teruss!", sub: "HADIAH MENANTIMU DI DEPAN" }
-        ];
-
-        let quoteIndex = 0;
-        setInterval(() => {
-            quoteIndex = (quoteIndex + 1) % quotes.length;
-            const t = document.getElementById('quoteTitle');
-            const s = document.getElementById('quoteSubtitle');
-            
-            t.style.opacity = 0;
-            s.style.opacity = 0;
-            
-            setTimeout(() => {
-                t.textContent = quotes[quoteIndex].title;
-                s.textContent = quotes[quoteIndex].sub;
-                t.style.opacity = 1;
-                s.style.opacity = 1;
-            }, 500);
-        }, 7000);
-
-        // --- INTERAKSI KUCING RANDOM ---
-        const catEmoji = document.getElementById('catEmoji');
-        const catEmotes = ['🐈', '🐈‍⬛', '😹', '😺', '🐱'];
+    <!-- Main Content -->
+    <main class="flex-grow w-full max-w-5xl mx-auto px-6 -mt-16 pb-20 relative z-20">
         
-        // Ganti-ganti jenis kucing/ekspresi biar gak bosen
-        setInterval(() => {
-            const randomEmote = catEmotes[Math.floor(Math.random() * catEmotes.length)];
-            catEmoji.textContent = randomEmote;
-        }, 10000);
-    </script>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+
+            <!-- 1. Menu Utama: ASAS (Assessment Akhir) -->
+            <a href="https://www.korwilsine.web.id/asas" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl flex flex-col h-full group">
+                <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform">
+                    <i class="fa-solid fa-clipboard-check text-3xl"></i>
+                </div>
+                <div class="flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-emerald-600 transition-colors">ASSESSMENT AKHIR</h2>
+                    <p class="text-slate-500 leading-relaxed">
+                        Klik di sini untuk mengakses portal utama pelaksanaan Assessment Akhir Semester (ASAS) Digital.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center justify-between">
+                    <span class="px-4 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">Aktif</span>
+                    <i class="fa-solid fa-circle-arrow-right text-emerald-500 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </div>
+            </a>
+
+            <!-- Placeholder Slots untuk Masa Depan -->
+            <div class="bg-slate-200/50 rounded-3xl p-8 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center opacity-70">
+                <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 mb-4">
+                    <i class="fa-solid fa-lock text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-400 uppercase tracking-widest">Aplikasi Mendatang</h3>
+                <p class="text-slate-400 text-sm mt-2 font-medium italic">Sedang dikembangkan</p>
+            </div>
+
+            <div class="bg-slate-200/50 rounded-3xl p-8 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center opacity-70">
+                <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 mb-4">
+                    <i class="fa-solid fa-lock text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-400 uppercase tracking-widest">Aplikasi Mendatang</h3>
+                <p class="text-slate-400 text-sm mt-2 font-medium italic">Sedang dikembangkan</p>
+            </div>
+
+        </div>
+
+        <!-- Quick Info Footer inside main -->
+        <div class="mt-16 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
+                    <i class="fa-solid fa-circle-info text-xl"></i>
+                </div>
+                <p class="text-sm text-slate-600">
+                    Gunakan peramban Google Chrome versi terbaru untuk pengalaman ujian yang lebih stabil.
+                </p>
+            </div>
+            <a href="https://www.yoriapp.site" class="text-blue-600 font-semibold hover:underline text-sm flex items-center gap-2">
+                Hubungi Admin <i class="fa-solid fa-chevron-right text-xs"></i>
+            </a>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full py-8 text-center mt-auto border-t border-slate-200">
+        <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">
+            &copy; <script>document.write(new Date().getFullYear())</script> KORWIL SINE
+        </p>
+        <p class="text-slate-400 text-[10px]">
+            Powered by YoriApp Technology
+        </p>
+    </footer>
+
 </body>
 </html>
