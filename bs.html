@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Korwil Sine | Portal Berita & Kegiatan</title>
+  <!-- Tailwind + Fonts + Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #f8fafc; color: #1e293b; scroll-behavior: smooth; }
+    .teal-bg { background-color: #218380; }
+    .teal-text { color: #218380; }
+    .hover-scale { transition: all 0.2s ease; }
+    .hover-scale:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1); }
+    /* Lightbox / Modal Gallery */
+    .gallery-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: visibility 0.2s, opacity 0.2s;
+    }
+    .gallery-modal.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-img {
+      max-width: 85vw;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 1rem;
+      box-shadow: 0 20px 35px -10px black;
+    }
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(4px);
+      border-radius: 9999px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      color: white;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.5); color: #0f172a; }
+    .close-modal {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 2rem;
+      color: white;
+      cursor: pointer;
+      background: rgba(0,0,0,0.5);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .spinner {
+      border: 3px solid rgba(33,131,128,0.2);
+      border-top: 3px solid #218380;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .custom-scroll::-webkit-scrollbar { width: 5px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #e2e8f0; border-radius: 10px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #218380; border-radius: 10px; }
+  </style>
+</head>
+<body class="antialiased">
+
+  <!-- NAVBAR -->
+  <nav class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-5 md:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <div class="bg-white p-1.5 rounded-xl shadow-sm border border-slate-100">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Lambang_Kabupaten_Ngawi_%28svg%29.svg/1280px-Lambang_Kabupaten_Ngawi_%28svg%29.svg.png" alt="Logo Ngawi" class="h-10 w-auto object-contain">
+        </div>
+        <div>
+          <h1 class="font-extrabold text-slate-800 leading-tight text-sm md:text-base uppercase tracking-tight">KORWILDIKBUD KEC. SINE</h1>
+          <p class="text-[10px] text-teal-600 font-bold uppercase tracking-wider">BERITA & KEGIATAN TERPADU</p>
+        </div>
+      </div>
+      <div class="flex gap-1 bg-slate-100 p-1 rounded-2xl">
+        <button data-section="berita" class="nav-btn-section px-5 py-2 rounded-xl text-xs font-bold uppercase transition-all bg-white text-slate-800 shadow-sm">Berita</button>
+        <button data-section="galeri" class="nav-btn-section px-5 py-2 rounded-xl text-xs font-bold uppercase transition-all text-slate-600 hover:text-slate-800">Galeri Kegiatan</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-5 md:px-8 py-10">
+    <!-- ======================= SECTION BERITA ======================= -->
+    <section id="berita-section" class="transition-all duration-300">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-1 h-10 teal-bg rounded-full"></div>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">BERITA <span class="teal-text">TERKINI</span></h2>
+        <span class="ml-auto text-xs bg-slate-100 px-3 py-1 rounded-full font-medium">Kegiatan & Informasi</span>
+      </div>
+
+      <!-- Grid berita dinamis 3 card (contoh berita aktual korwil sine) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Berita 1 -->
+        <div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden hover-scale transition-all duration-200">
+          <div class="h-48 w-full bg-slate-200 overflow-hidden">
+            <img src="https://raw.githubusercontent.com/YorianP22/CP22/main/Berita/op/IMG-20260410-WA0032.jpg" alt="Kegiatan Assesment" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Galeri+Kegiatan'">
+          </div>
+          <div class="p-5">
+            <div class="flex items-center gap-2 text-[11px] text-teal-600 font-bold mb-2">
+              <i data-lucide="calendar" class="w-3.5 h-3.5"></i> <span>10 Mei 2026</span>
+            </div>
+            <h3 class="font-bold text-lg text-slate-800 mb-2">Pelaksanaan Assesment Akhir Semester Genap</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">Korwil Sine sukses menggelar ujian akhir semester berbasis digital di 32 sekolah se-Kecamatan Sine dengan sistem terintegrasi.</p>
+            <div class="mt-4 flex items-center text-teal-600 text-xs font-semibold gap-1">
+              <span>Baca selengkapnya</span> <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </div>
+          </div>
+        </div>
+        <!-- Berita 2 -->
+        <div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden hover-scale transition-all duration-200">
+          <div class="h-48 w-full bg-slate-200 overflow-hidden">
+            <img src="https://raw.githubusercontent.com/YorianP22/CP22/main/Berita/op/IMG-20260410-WA0034.jpg" alt="Rapat Koordinasi" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Rapat+Korwil'">
+          </div>
+          <div class="p-5">
+            <div class="flex items-center gap-2 text-[11px] text-teal-600 font-bold mb-2">
+              <i data-lucide="calendar" class="w-3.5 h-3.5"></i> <span>5 Mei 2026</span>
+            </div>
+            <h3 class="font-bold text-lg text-slate-800 mb-2">Rapat Pleno Persiapan Ujian Daring</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">Seluruh kepala sekolah SD se-Kecamatan Sine mengikuti rapat koordinasi teknis pelaksanaan ujian dan distribusi token.</p>
+            <div class="mt-4 flex items-center text-teal-600 text-xs font-semibold gap-1">
+              <span>Baca selengkapnya</span> <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </div>
+          </div>
+        </div>
+        <!-- Berita 3 -->
+        <div class="bg-white rounded-2xl shadow-md border border-slate-100 overflow-hidden hover-scale transition-all duration-200">
+          <div class="h-48 w-full bg-slate-200 overflow-hidden">
+            <img src="https://raw.githubusercontent.com/YorianP22/CP22/main/Berita/op/IMG-20260410-WA0036.jpg" alt="Sosialisasi Digital" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/600x400/e2e8f0/475569?text=Sosialisasi'">
+          </div>
+          <div class="p-5">
+            <div class="flex items-center gap-2 text-[11px] text-teal-600 font-bold mb-2">
+              <i data-lucide="calendar" class="w-3.5 h-3.5"></i> <span>28 April 2026</span>
+            </div>
+            <h3 class="font-bold text-lg text-slate-800 mb-2">Sosialisasi Exambrowser & Kartu Digital</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">Tim IT Korwil memberikan pelatihan penggunaan aplikasi ujian kepada operator sekolah guna kelancaran asesmen.</p>
+            <div class="mt-4 flex items-center text-teal-600 text-xs font-semibold gap-1">
+              <span>Baca selengkapnya</span> <i data-lucide="arrow-right" class="w-3 h-3"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- tambahan banner info -->
+      <div class="mt-12 teal-bg rounded-3xl p-6 md:p-8 text-white shadow-xl flex flex-wrap justify-between items-center">
+        <div>
+          <h4 class="text-xl font-black flex items-center gap-2"><i data-lucide="megaphone" class="w-5 h-5"></i> Informasi Aktivitas Terbaru</h4>
+          <p class="text-white/80 text-sm mt-1">Jadwal ujian, pengumuman kelulusan, dan pembagian rapor akan diinformasikan melalui kanal resmi.</p>
+        </div>
+        <button class="mt-3 md:mt-0 bg-white text-teal-700 px-6 py-2.5 rounded-2xl text-xs font-extrabold shadow-lg hover:bg-slate-100 transition">Arsip Lengkap</button>
+      </div>
+    </section>
+
+    <!-- ======================= SECTION GALERI FOTO (GITHUB FOLDER) ======================= -->
+    <section id="galeri-section" class="mt-20 hidden transition-all duration-300">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-1 h-10 teal-bg rounded-full"></div>
+        <h2 class="text-2xl md:text-3xl font-black text-slate-800 tracking-tight">GALERI <span class="teal-text">KEGIATAN</span></h2>
+        <span class="ml-auto text-xs bg-slate-100 px-3 py-1 rounded-full font-medium">📸 Klik foto untuk melihat detail</span>
+      </div>
+      <!-- Loading indicator -->
+      <div id="gallery-loading" class="flex justify-center items-center py-20 flex-col gap-3">
+        <div class="spinner"></div>
+        <p class="text-slate-500 text-sm font-medium">Mengambil foto dari galeri kegiatan...</p>
+      </div>
+      <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 auto-rows-min"></div>
+      <div id="gallery-error" class="hidden text-center py-20 bg-slate-50 rounded-2xl">
+        <i data-lucide="image-off" class="w-12 h-12 text-slate-400 mx-auto mb-3"></i>
+        <p class="text-slate-500">Gagal memuat galeri. Silakan refresh atau cek koneksi.<br>Pastikan folder GitHub berisi file gambar (.jpg/.png/.jpeg)</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- LIGHTBOX MODAL PICASA STYLE -->
+  <div id="lightboxModal" class="gallery-modal">
+    <button class="close-modal" id="closeLightbox">✕</button>
+    <button id="prevImg" class="nav-btn left-6 md:left-10"><i data-lucide="chevron-left" class="w-6 h-6"></i></button>
+    <img id="modalImage" class="modal-img" alt="preview">
+    <button id="nextImg" class="nav-btn right-6 md:right-10"><i data-lucide="chevron-right" class="w-6 h-6"></i></button>
+    <div class="absolute bottom-6 left-0 right-0 text-center text-white text-xs bg-black/50 w-fit mx-auto px-4 py-2 rounded-full backdrop-blur-sm" id="counterImg"></div>
+  </div>
+
+  <footer class="border-t border-slate-200 bg-white mt-20 py-8 text-center">
+    <div class="max-w-7xl mx-auto px-5">
+      <p class="text-[11px] text-slate-400 font-bold uppercase tracking-[0.2em]">KORWIL PENDIDIKAN KECAMATAN SINE - KABUPATEN NGAWI</p>
+      <p class="text-[10px] text-slate-300 mt-2">Sistem Informasi Berita & Dokumentasi Kegiatan | Sumber foto: Repositori GitHub Resmi</p>
+      <div class="flex justify-center gap-4 mt-3 text-slate-400 text-[11px]">
+        <span>📅 2025/2026</span>
+        <span>⚡ Digitalisasi Pendidikan</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Inisialisasi ulang lucide icons setiap perubahan
+    function initIcons() {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+    setTimeout(initIcons, 100);
+    document.addEventListener('DOMContentLoaded', initIcons);
+    
+    // Navigasi section berita / galeri
+    const beritaSection = document.getElementById('berita-section');
+    const galeriSection = document.getElementById('galeri-section');
+    const navBtns = document.querySelectorAll('.nav-btn-section');
+    
+    function setActiveSection(section) {
+      if (section === 'berita') {
+        beritaSection.classList.remove('hidden');
+        galeriSection.classList.add('hidden');
+        navBtns.forEach(btn => {
+          if(btn.innerText.trim() === 'Berita') {
+            btn.classList.add('bg-white', 'text-slate-800', 'shadow-sm');
+            btn.classList.remove('text-slate-600');
+          } else {
+            btn.classList.remove('bg-white', 'text-slate-800', 'shadow-sm');
+            btn.classList.add('text-slate-600');
+          }
+        });
+      } else {
+        beritaSection.classList.add('hidden');
+        galeriSection.classList.remove('hidden');
+        navBtns.forEach(btn => {
+          if(btn.innerText.trim() === 'Galeri Kegiatan') {
+            btn.classList.add('bg-white', 'text-slate-800', 'shadow-sm');
+            btn.classList.remove('text-slate-600');
+          } else {
+            btn.classList.remove('bg-white', 'text-slate-800', 'shadow-sm');
+            btn.classList.add('text-slate-600');
+          }
+        });
+        // Load gallery jika belum pernah termuat
+        if (!window.galleryLoaded) {
+          loadGalleryFromGitHub();
+        }
+      }
+    }
+    
+    navBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const section = btn.innerText.trim() === 'Berita' ? 'berita' : 'galeri';
+        setActiveSection(section);
+      });
+    });
+    
+    // ======================= AMBIL FOTO DARI GITHUB FOLDER =======================
+    const GITHUB_API = 'https://api.github.com/repos/YorianP22/CP22/contents/Berita/op';
+    let galleryImages = []; // array { url, name }
+    let currentIndex = 0;
+    
+    const galleryGrid = document.getElementById('gallery-grid');
+    const loadingDiv = document.getElementById('gallery-loading');
+    const errorDiv = document.getElementById('gallery-error');
+    const modal = document.getElementById('lightboxModal');
+    const modalImg = document.getElementById('modalImage');
+    const closeModalBtn = document.getElementById('closeLightbox');
+    const prevBtn = document.getElementById('prevImg');
+    const nextBtn = document.getElementById('nextImg');
+    const counterSpan = document.getElementById('counterImg');
+    
+    async function loadGalleryFromGitHub() {
+      try {
+        loadingDiv.classList.remove('hidden');
+        galleryGrid.innerHTML = '';
+        errorDiv.classList.add('hidden');
+        
+        const response = await fetch(GITHUB_API);
+        if (!response.ok) throw new Error(`Gagal mengambil data: ${response.status}`);
+        const files = await response.json();
+        
+        // filter file gambar (jpg, jpeg, png, webp)
+        const imageFiles = files.filter(file => {
+          const ext = file.name.split('.').pop().toLowerCase();
+          return ['jpg', 'jpeg', 'png', 'webp', 'JPG', 'JPEG', 'PNG'].includes(ext);
+        });
+        
+        if (imageFiles.length === 0) {
+          loadingDiv.classList.add('hidden');
+          errorDiv.classList.remove('hidden');
+          errorDiv.innerHTML = `<div class="text-center"><i data-lucide="folder" class="w-12 h-12 text-slate-400 mx-auto mb-3"></i><p class="font-medium">Belum ada foto di folder kegiatan.<br>Tambahkan file gambar ke folder <span class="font-mono">/Berita/op/</span> di repository GitHub.</p></div>`;
+          initIcons();
+          return;
+        }
+        
+        // convert raw URL
+        galleryImages = imageFiles.map(file => ({
+          url: file.download_url,
+          name: file.name.replace(/\.[^/.]+$/, '').substring(0, 30)
+        }));
+        
+        // Render grid
+        galleryGrid.innerHTML = '';
+        galleryImages.forEach((img, idx) => {
+          const colDiv = document.createElement('div');
+          colDiv.className = 'group cursor-pointer overflow-hidden rounded-2xl bg-white shadow-md border border-slate-100 transition-all hover:shadow-xl';
+          colDiv.innerHTML = `
+            <div class="aspect-square overflow-hidden bg-slate-100 relative">
+              <img src="${img.url}" alt="${img.name}" loading="lazy" class="w-full h-full object-cover transition duration-300 group-hover:scale-105" onerror="this.src='https://placehold.co/400x400/f1f5f9/94a3b8?text=Gagal+Load'">
+            </div>
+            <div class="p-3">
+              <p class="text-[11px] font-medium text-slate-500 truncate">${img.name}</p>
+            </div>
+          `;
+          colDiv.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openLightbox(idx);
+          });
+          galleryGrid.appendChild(colDiv);
+        });
+        
+        loadingDiv.classList.add('hidden');
+        window.galleryLoaded = true;
+        initIcons();  // refresh icons after dynamic content
+      } catch (err) {
+        console.error(err);
+        loadingDiv.classList.add('hidden');
+        errorDiv.classList.remove('hidden');
+        errorDiv.innerHTML = `<i data-lucide="alert-triangle" class="w-10 h-10 text-amber-500 mx-auto mb-2"></i><p class="text-slate-600 text-sm">Gagal mengakses galeri. Pastikan repository dan folder tersedia.<br>${err.message}</p>`;
+        initIcons();
+      }
+    }
+    
+    // Lightbox system seperti Picasa (klik gambar > zoom, navigasi)
+    function openLightbox(index) {
+      if (!galleryImages.length) return;
+      currentIndex = index;
+      updateModalImage();
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function updateModalImage() {
+      if (galleryImages[currentIndex]) {
+        modalImg.src = galleryImages[currentIndex].url;
+        counterSpan.innerText = `${currentIndex+1} / ${galleryImages.length}`;
+      }
+    }
+    
+    function nextImage(e) {
+      e?.stopPropagation();
+      if (galleryImages.length === 0) return;
+      currentIndex = (currentIndex + 1) % galleryImages.length;
+      updateModalImage();
+    }
+    
+    function prevImage(e) {
+      e?.stopPropagation();
+      if (galleryImages.length === 0) return;
+      currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+      updateModalImage();
+    }
+    
+    function closeLightbox() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+    
+    // Event listener modal
+    closeModalBtn.addEventListener('click', closeLightbox);
+    nextBtn.addEventListener('click', nextImage);
+    prevBtn.addEventListener('click', prevImage);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeLightbox();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (!modal.classList.contains('active')) return;
+      if (e.key === 'ArrowRight') nextImage();
+      if (e.key === 'ArrowLeft') prevImage();
+      if (e.key === 'Escape') closeLightbox();
+    });
+    
+    // auto load default berita (tampilan awal)
+    // Preload jika galeri belum, tapi kita tetap ambil data cache saat pertama kali klik galeri
+    // Inisiasi gallery tidak otomatis preload agar tidak memberatkan, tapi data tetap siap
+    window.galleryLoaded = false;
+    
+    // Tambahkan fallback untuk gambar berita jika tidak load dari raw (tetap tampil elegan)
+    const allBeritaImgs = document.querySelectorAll('#berita-section img');
+    allBeritaImgs.forEach(img => {
+      img.addEventListener('error', () => {
+        if(!img.src.includes('placehold')) {
+          img.src = 'https://placehold.co/600x400/e2e8f0/1e293b?text=Kegiatan+Korwil';
+        }
+      });
+    });
+    
+    // Inisialisasi lucide ulang setelah perubahan dinamis(galeri setelah load)
+    const observer = new MutationObserver(() => {
+      if (window.lucide) lucide.createIcons();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    // Tampilkan default berita, dan sembunyikan galeri awal
+    setActiveSection('berita');
+    
+    // Memastikan untuk tombol tutorial ringan : info folder github
+    console.log('Halaman Berita & Galeri Korwil Sine - Sumber foto GitHub /Berita/op');
+    
+    // handle jika refresh galeri manual bisa reload (optional) tapi tidak perlu tombol tambahan karena user friendly
+    // optional: tambahkan pesan jika ingin refresh galeri (user dapat merefresh dengan pindah tab?)
+    // Efek smooth extra: 
+    const style = document.createElement('style');
+    style.textContent = `
+      .gallery-modal img { transition: transform 0.2s; }
+      .nav-btn-section { transition: all 0.2s ease; }
+    `;
+    document.head.appendChild(style);
+  </script>
+</body>
+</html>
