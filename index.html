@@ -47,22 +47,47 @@
             background: #cbd5e1; 
             border-radius: 10px;
         }
+
+        .clock-badge {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .clock-badge:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
     </style>
 </head>
 <body class="text-slate-800 flex flex-col min-h-screen">
 
     <!-- Header Section -->
-    <header class="hero-gradient text-white pt-12 pb-24 px-6 relative overflow-hidden">
+    <header class="hero-gradient text-white pt-16 pb-32 px-6 relative overflow-hidden">
         <div class="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
             <i class="fa-solid fa-graduation-cap text-[200px]"></i>
         </div>
-        
+
         <div class="max-w-5xl mx-auto flex flex-col items-center text-center relative z-10">
-            <img src="https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true" alt="Logo" class="w-20 h-20 mb-6 drop-shadow-lg">
-            <h1 class="text-3xl md:text-5xl font-extrabold mb-4 tracking-tight">KORWIL SINE</h1>
-            <p class="text-slate-300 text-lg md:text-xl max-w-2xl font-light">
+            <img src="https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true" alt="Logo" class="w-24 h-24 mb-8 drop-shadow-2xl">
+            
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">KORWIL SINE</h1>
+            
+            <p class="text-slate-300 text-lg md:text-xl max-w-2xl font-light leading-relaxed">
                 Membangun pondasi bangsa dari tingkat dasar. Mari kita jadikan setiap sekolah di Kecamatan Sine sebagai rumah kedua yang menyenangkan untuk belajar.
             </p>
+
+            <div class="mt-10 flex flex-col items-center">
+                <div class="clock-badge px-8 py-3 rounded-2xl flex flex-col md:flex-row items-center gap-2 md:gap-6 shadow-2xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span id="clock-time" class="text-2xl md:text-3xl font-bold tracking-wider text-white">00:00:00</span>
+                    </div>
+                    <div class="hidden md:block w-[1px] h-8 bg-white/20"></div>
+                    <div id="clock-date" class="text-sm md:text-base font-medium text-slate-300 tracking-wide">Memuat Tanggal...</div>
+                </div>
+            </div>
         </div>
     </header>
 
@@ -88,7 +113,7 @@
                 </div>
             </a>
 
-            <!-- Placeholder Slots untuk Masa Depan -->
+            <!-- Placeholder Slots -->
             <div class="bg-slate-200/50 rounded-3xl p-8 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center opacity-70">
                 <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 mb-4">
                     <i class="fa-solid fa-lock text-xl"></i>
@@ -107,7 +132,7 @@
 
         </div>
 
-        <!-- Quick Info Footer inside main -->
+        <!-- Info Footer -->
         <div class="mt-16 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-4">
                 <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
@@ -126,12 +151,53 @@
     <!-- Footer -->
     <footer class="w-full py-8 text-center mt-auto border-t border-slate-200">
         <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">
-            &copy; <script>document.write(new Date().getFullYear())</script> KORWIL SINE
+            &copy; <span id="year-display"></span> KORWIL SINE
         </p>
         <p class="text-slate-400 text-[10px]">
             Powered by YoriApp Technology
         </p>
     </footer>
+
+    <script>
+        /**
+         * Mengupdate jam, menit, detik, dan tanggal secara real-time
+         */
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Format Waktu (HH:mm:ss)
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            
+            // Format Tanggal Indonesia
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const dateString = now.toLocaleDateString('id-ID', options);
+            
+            // Update DOM
+            const timeElement = document.getElementById('clock-time');
+            const dateElement = document.getElementById('clock-date');
+            const yearElement = document.getElementById('year-display');
+
+            if(timeElement) timeElement.textContent = timeString;
+            if(dateElement) dateElement.textContent = dateString;
+            if(yearElement) yearElement.textContent = now.getFullYear();
+        }
+
+        // Jalankan setiap detik
+        setInterval(updateDateTime, 1000);
+
+        // Panggil pertama kali saat halaman dimuat
+        window.onload = function() {
+            updateDateTime();
+        };
+    </script>
 
 </body>
 </html>
