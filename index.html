@@ -29,6 +29,9 @@
 
         .app-card {
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Memastikan kartu mengisi tinggi grid */
         }
 
         .app-card:hover {
@@ -54,13 +57,7 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
-        
-        .clock-badge:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
 
-        /* Modal Animation */
         .modal-overlay {
             transition: opacity 0.3s ease-in-out;
             backdrop-filter: blur(4px);
@@ -82,7 +79,6 @@
 </head>
 <body class="text-slate-800 flex flex-col min-h-screen">
 
-    <!-- Header Section -->
     <header class="hero-gradient text-white pt-16 pb-32 px-6 relative overflow-hidden">
         <div class="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
             <i class="fa-solid fa-graduation-cap text-[200px]"></i>
@@ -110,19 +106,19 @@
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-grow w-full max-w-5xl mx-auto px-6 -mt-16 pb-20 relative z-20">
         
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-center">
+        <!-- Grid container dengan items-stretch untuk tinggi yang seragam -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
 
-            <!-- 1. Menu Utama: ASAS (Assessment Akhir) -->
-            <a href="https://www.korwilsine.web.id/asas" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl flex flex-col h-full group">
-                <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform">
+            <!-- 1. Menu: ASAS -->
+            <a href="https://www.korwilsine.web.id/asas" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl group">
+                <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform shrink-0">
                     <i class="fa-solid fa-clipboard-check text-3xl"></i>
                 </div>
                 <div class="flex-grow">
                     <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-emerald-600 transition-colors">ASSESSMENT AKHIR</h2>
-                    <p class="text-slate-500 leading-relaxed">
+                    <p class="text-slate-500 text-sm leading-relaxed">
                         Klik di sini untuk mengakses portal utama pelaksanaan Assessment Akhir Semester (ASAS) Digital.
                     </p>
                 </div>
@@ -132,215 +128,168 @@
                 </div>
             </a>
 
+            <!-- 2. Menu: Monitoring Presensi -->
+            <a href="https://yoriapp.site/e-presensi" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl group">
+                <div class="w-16 h-16 rounded-2xl bg-blue-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform shrink-0">
+                    <i class="fa-solid fa-fingerprint text-3xl"></i>
+                </div>
+                <div class="flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">MONITORING PRESENSI</h2>
+                    <p class="text-slate-500 text-sm leading-relaxed">
+                        Klik di sini untuk mengakses portal E-Presensi dan pemantauan kehadiran secara real-time.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center justify-between">
+                    <span class="px-4 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">Aktif</span>
+                    <i class="fa-solid fa-circle-arrow-right text-blue-500 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </div>
+            </a>
+
+            <!-- 3. Menu: Aplikasi Presensi (Updated) -->
+            <a href="https://yoriapp.site/unduhan" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl group">
+                <div class="w-16 h-16 rounded-2xl bg-violet-600 text-white flex items-center justify-center mb-6 shadow-lg shadow-violet-200 group-hover:scale-110 transition-transform shrink-0">
+                    <i class="fa-solid fa-download text-3xl"></i>
+                </div>
+                <div class="flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-violet-600 transition-colors uppercase">Aplikasi Presensi</h2>
+                    <p class="text-slate-500 text-sm leading-relaxed">
+                        Klik di sini untuk mengunduh aplikasi presensi resmi dan panduan penggunaan perangkat.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center justify-between">
+                    <span class="px-4 py-1 bg-violet-100 text-violet-700 text-xs font-bold rounded-full uppercase tracking-wider">Download</span>
+                    <i class="fa-solid fa-circle-arrow-right text-violet-600 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </div>
+            </a>
+
+            <!-- 4. Menu: Rapot Sisipan (New) -->
+            <a href="https://yoriapp.site/sisipan" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl group">
+                <div class="w-16 h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-amber-200 group-hover:scale-110 transition-transform shrink-0">
+                    <i class="fa-solid fa-file-invoice text-3xl"></i>
+                </div>
+                <div class="flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-amber-600 transition-colors uppercase">Rapot Sisipan</h2>
+                    <p class="text-slate-500 text-sm leading-relaxed">
+                        Akses portal pengisian dan pencetakan Rapot Sisipan untuk seluruh sekolah di wilayah Sine.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center justify-between">
+                    <span class="px-4 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full uppercase tracking-wider">Aktif</span>
+                    <i class="fa-solid fa-circle-arrow-right text-amber-500 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </div>
+            </a>
+
             <!-- Placeholder Slots -->
-            <div class="bg-slate-200/50 rounded-3xl p-8 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center opacity-70">
+            <div class="bg-slate-200/50 rounded-3xl p-8 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center opacity-70 min-h-[300px]">
                 <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 mb-4">
                     <i class="fa-solid fa-lock text-xl"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-400 uppercase tracking-widest">Aplikasi Mendatang</h3>
-                <p class="text-slate-400 text-sm mt-2 font-medium italic">Sedang dikembangkan</p>
-            </div>
-            
-            
-             <a href="https://yoriapp.site/e-presensi" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl flex flex-col h-full group">
-                <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-clipboard-check text-3xl"></i>
-                </div>
-                <div class="flex-grow">MONITORING PRESENSI</h2>
-                    <p class="text-slate-500 leading-relaxed">
-                        Klik di sini untuk mengakses portal E-Presensi.
-                    </p>
-                </div>
-                <div class="mt-8 flex items-center justify-between">
-                    <span class="px-4 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">Aktif</span>
-                    <i class="fa-solid fa-circle-arrow-right text-emerald-500 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                </div>
-            </a>
-
-             <a href="https://yoriapp.site/e-presensi" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl flex flex-col h-full group">
-                <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform">
-                    <i class="fa-solid fa-clipboard-check text-3xl"></i>
-                </div>
-                <div class="flex-grow">MONITORING PRESENSI</h2>
-                    <p class="text-slate-500 leading-relaxed">
-                        Klik di sini untuk mengakses portal E-Presensi.
-                    </p>
-                </div>
-                <div class="mt-8 flex items-center justify-between">
-                    <span class="px-4 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">Aktif</span>
-                    <i class="fa-solid fa-circle-arrow-right text-emerald-500 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                </div>
-            </a>
-
-            <div class="bg-slate-200/50 rounded-3xl p-8 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center opacity-70">
-                <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 mb-4">
-                    <i class="fa-solid fa-lock text-xl"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-400 uppercase tracking-widest">Aplikasi Mendatang</h3>
-                <p class="text-slate-400 text-sm mt-2 font-medium italic">Sedang dikembangkan</p>
+                <h3 class="text-lg font-bold text-slate-400 uppercase tracking-widest text-sm">Mendatang</h3>
             </div>
 
-            <div class="bg-slate-200/50 rounded-3xl p-8 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center opacity-70">
+            <div class="bg-slate-200/50 rounded-3xl p-8 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center opacity-70 min-h-[300px]">
                 <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 mb-4">
                     <i class="fa-solid fa-lock text-xl"></i>
                 </div>
-                <h3 class="text-lg font-bold text-slate-400 uppercase tracking-widest">Aplikasi Mendatang</h3>
-                <p class="text-slate-400 text-sm mt-2 font-medium italic">Sedang dikembangkan</p>
+                <h3 class="text-lg font-bold text-slate-400 uppercase tracking-widest text-sm">Mendatang</h3>
             </div>
 
         </div>
 
-        <!-- Info Footer -->
         <div class="mt-16 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-4">
                 <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
                     <i class="fa-solid fa-circle-info text-xl"></i>
                 </div>
-                <p class="text-sm text-slate-600">
+                <p class="text-sm text-slate-600 max-w-xl">
                     Satu pintu menuju layanan pendidikan yang transparan, akuntabel, dan modern bagi seluruh masyarakat Kecamatan Sine.
                 </p>
             </div>
-            <!-- Modified link to trigger popup -->
-            <button onclick="toggleModal()" class="text-blue-600 font-semibold hover:text-blue-800 transition-colors text-sm flex items-center gap-2 focus:outline-none">
+            <button onclick="toggleModal()" class="text-blue-600 font-semibold hover:text-blue-800 transition-colors text-sm flex items-center gap-2 focus:outline-none shrink-0">
                 Hubungi Admin <i class="fa-solid fa-chevron-right text-xs"></i>
             </button>
         </div>
     </main>
 
-    <!-- Contact Admin Popup Modal -->
     <div id="contactModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 modal-overlay modal-hidden bg-slate-900/60">
         <div class="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden modal-content relative">
-            <!-- Close Button -->
             <button onclick="toggleModal()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-all z-10">
                 <i class="fa-solid fa-xmark text-lg"></i>
             </button>
 
-            <!-- Modal Header -->
             <div class="p-8 pb-4 text-center">
                 <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
                     <i class="fa-solid fa-headset text-3xl"></i>
                 </div>
                 <h3 class="text-xl font-bold text-slate-900">Hubungi Admin</h3>
-                <p class="text-slate-500 text-sm mt-1">Silakan pilih metode komunikasi yang Anda inginkan</p>
+                <p class="text-slate-500 text-sm mt-1">Silakan pilih metode komunikasi</p>
             </div>
 
-            <!-- Modal Body (Options) -->
             <div class="p-6 pt-2 space-y-3">
-                <!-- Website Option -->
+                <!-- Website -->
                 <a href="https://yoriapp.site" target="_blank" class="flex items-center p-4 bg-indigo-50 border border-indigo-100 rounded-2xl group hover:bg-indigo-600 hover:border-indigo-600 transition-all duration-300">
-                    <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-indigo-600 transition-colors shadow-lg shadow-indigo-200 group-hover:shadow-none">
+                    <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-indigo-600 transition-colors shadow-lg">
                         <i class="fa-solid fa-globe text-2xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="font-bold text-indigo-900 group-hover:text-white transition-colors">Situs Resmi Admin</p>
-                        <p class="text-xs text-indigo-600 group-hover:text-indigo-100 transition-colors">www.yoriapp.site</p>
+                        <p class="font-bold text-indigo-900 group-hover:text-white text-sm">Situs Resmi Admin</p>
+                        <p class="text-[10px] text-indigo-600 group-hover:text-indigo-100">www.yoriapp.site</p>
                     </div>
-                    <i class="fa-solid fa-arrow-right ml-auto text-indigo-300 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0"></i>
                 </a>
 
-                <!-- WhatsApp Option -->
+                <!-- WhatsApp -->
                 <a href="https://wa.me/6282232414008" target="_blank" class="flex items-center p-4 bg-emerald-50 border border-emerald-100 rounded-2xl group hover:bg-emerald-500 hover:border-emerald-500 transition-all duration-300">
-                    <div class="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-emerald-500 transition-colors shadow-lg shadow-emerald-200 group-hover:shadow-none">
+                    <div class="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-emerald-500 transition-colors shadow-lg">
                         <i class="fa-brands fa-whatsapp text-2xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="font-bold text-emerald-900 group-hover:text-white transition-colors">WhatsApp</p>
-                        <p class="text-xs text-emerald-600 group-hover:text-emerald-100 transition-colors">0822-3241-4008</p>
+                        <p class="font-bold text-emerald-900 group-hover:text-white text-sm">WhatsApp</p>
+                        <p class="text-[10px] text-emerald-600 group-hover:text-emerald-100">0822-3241-4008</p>
                     </div>
-                    <i class="fa-solid fa-arrow-right ml-auto text-emerald-300 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0"></i>
                 </a>
 
-                <!-- Email Option -->
+                <!-- Email -->
                 <a href="mailto:yoshiprakoso@gmail.com" class="flex items-center p-4 bg-blue-50 border border-blue-100 rounded-2xl group hover:bg-blue-600 hover:border-blue-600 transition-all duration-300">
-                    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-blue-600 transition-colors shadow-lg shadow-blue-200 group-hover:shadow-none">
+                    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-blue-600 transition-colors shadow-lg">
                         <i class="fa-solid fa-envelope text-2xl"></i>
                     </div>
                     <div class="ml-4">
-                        <p class="font-bold text-blue-900 group-hover:text-white transition-colors">Email Official</p>
-                        <p class="text-xs text-blue-600 group-hover:text-blue-100 transition-colors">yoshiprakoso@gmail.com</p>
+                        <p class="font-bold text-blue-900 group-hover:text-white text-sm">Email Official</p>
+                        <p class="text-[10px] text-blue-600 group-hover:text-blue-100">yoshiprakoso@gmail.com</p>
                     </div>
-                    <i class="fa-solid fa-arrow-right ml-auto text-blue-300 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0"></i>
                 </a>
-            </div>
-
-            <!-- Modal Footer -->
-            <div class="bg-slate-50 p-4 text-center">
-                <p class="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Kami siap melayani Anda</p>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
     <footer class="w-full py-8 text-center mt-auto border-t border-slate-200">
         <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">
             &copy; <span id="year-display"></span> KORWIL SINE
         </p>
-        <p class="text-slate-400 text-[10px]">
-            Powered by YoriApp Technology
-        </p>
+        <p class="text-slate-400 text-[10px]">Powered by YoriApp Technology</p>
     </footer>
 
     <script>
-        /**
-         * Mengupdate jam, menit, detik, dan tanggal secara real-time
-         */
         function updateDateTime() {
             const now = new Date();
-            
-            // Format Waktu (HH:mm:ss)
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            const timeString = `${hours}:${minutes}:${seconds}`;
-            
-            // Format Tanggal Indonesia
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
-            const dateString = now.toLocaleDateString('id-ID', options);
-            
-            // Update DOM
             const timeElement = document.getElementById('clock-time');
             const dateElement = document.getElementById('clock-date');
             const yearElement = document.getElementById('year-display');
 
-            if(timeElement) timeElement.textContent = timeString;
-            if(dateElement) dateElement.textContent = dateString;
+            if(timeElement) timeElement.textContent = now.toLocaleTimeString('id-ID', { hour12: false });
+            if(dateElement) dateElement.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             if(yearElement) yearElement.textContent = now.getFullYear();
         }
 
-        /**
-         * Fungsi untuk membuka/menutup Modal
-         */
         function toggleModal() {
             const modal = document.getElementById('contactModal');
-            if (modal.classList.contains('modal-hidden')) {
-                modal.classList.remove('modal-hidden');
-                document.body.style.overflow = 'hidden'; // Disable scroll
-            } else {
-                modal.classList.add('modal-hidden');
-                document.body.style.overflow = ''; // Enable scroll
-            }
+            modal.classList.toggle('modal-hidden');
+            document.body.style.overflow = modal.classList.contains('modal-hidden') ? '' : 'hidden';
         }
 
-        // Tutup modal jika user klik di luar area konten modal
-        window.onclick = function(event) {
-            const modal = document.getElementById('contactModal');
-            if (event.target == modal) {
-                toggleModal();
-            }
-        };
-
-        // Jalankan setiap detik
+        window.onclick = (e) => { if (e.target.id === 'contactModal') toggleModal(); };
         setInterval(updateDateTime, 1000);
-
-        // Panggil pertama kali saat halaman dimuat
-        window.onload = function() {
-            updateDateTime();
-        };
+        window.onload = updateDateTime;
     </script>
 
 </body>
