@@ -59,6 +59,25 @@
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
+        /* Modal Animation */
+        .modal-overlay {
+            transition: opacity 0.3s ease-in-out;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal-hidden .modal-content {
+            transform: scale(0.9) translateY(20px);
+        }
     </style>
 </head>
 <body class="text-slate-800 flex flex-col min-h-screen">
@@ -142,11 +161,75 @@
                     Satu pintu menuju layanan pendidikan yang transparan, akuntabel, dan modern bagi seluruh masyarakat Kecamatan Sine.
                 </p>
             </div>
-            <a href="https://www.yoriapp.site" class="text-blue-600 font-semibold hover:underline text-sm flex items-center gap-2">
+            <!-- Modified link to trigger popup -->
+            <button onclick="toggleModal()" class="text-blue-600 font-semibold hover:text-blue-800 transition-colors text-sm flex items-center gap-2 focus:outline-none">
                 Hubungi Admin <i class="fa-solid fa-chevron-right text-xs"></i>
-            </a>
+            </button>
         </div>
     </main>
+
+    <!-- Contact Admin Popup Modal -->
+    <div id="contactModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 modal-overlay modal-hidden bg-slate-900/60">
+        <div class="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden modal-content relative">
+            <!-- Close Button -->
+            <button onclick="toggleModal()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-all z-10">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <!-- Modal Header -->
+            <div class="p-8 pb-4 text-center">
+                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-headset text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Hubungi Admin</h3>
+                <p class="text-slate-500 text-sm mt-1">Silakan pilih metode komunikasi yang Anda inginkan</p>
+            </div>
+
+            <!-- Modal Body (Options) -->
+            <div class="p-6 pt-2 space-y-3">
+                <!-- Website Option -->
+                <a href="https://yoriapp.site" target="_blank" class="flex items-center p-4 bg-indigo-50 border border-indigo-100 rounded-2xl group hover:bg-indigo-600 hover:border-indigo-600 transition-all duration-300">
+                    <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-indigo-600 transition-colors shadow-lg shadow-indigo-200 group-hover:shadow-none">
+                        <i class="fa-solid fa-globe text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="font-bold text-indigo-900 group-hover:text-white transition-colors">Situs Resmi Admin</p>
+                        <p class="text-xs text-indigo-600 group-hover:text-indigo-100 transition-colors">www.yoriapp.site</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right ml-auto text-indigo-300 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0"></i>
+                </a>
+
+                <!-- WhatsApp Option -->
+                <a href="https://wa.me/6282232414008" target="_blank" class="flex items-center p-4 bg-emerald-50 border border-emerald-100 rounded-2xl group hover:bg-emerald-500 hover:border-emerald-500 transition-all duration-300">
+                    <div class="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-emerald-500 transition-colors shadow-lg shadow-emerald-200 group-hover:shadow-none">
+                        <i class="fa-brands fa-whatsapp text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="font-bold text-emerald-900 group-hover:text-white transition-colors">WhatsApp</p>
+                        <p class="text-xs text-emerald-600 group-hover:text-emerald-100 transition-colors">0822-3241-4008</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right ml-auto text-emerald-300 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0"></i>
+                </a>
+
+                <!-- Email Option -->
+                <a href="mailto:yoshiprakoso@gmail.com" class="flex items-center p-4 bg-blue-50 border border-blue-100 rounded-2xl group hover:bg-blue-600 hover:border-blue-600 transition-all duration-300">
+                    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-blue-600 transition-colors shadow-lg shadow-blue-200 group-hover:shadow-none">
+                        <i class="fa-solid fa-envelope text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="font-bold text-blue-900 group-hover:text-white transition-colors">Email Official</p>
+                        <p class="text-xs text-blue-600 group-hover:text-blue-100 transition-colors">yoshiprakoso@gmail.com</p>
+                    </div>
+                    <i class="fa-solid fa-arrow-right ml-auto text-blue-300 group-hover:text-white opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-10px] group-hover:translate-x-0"></i>
+                </a>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 p-4 text-center">
+                <p class="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Kami siap melayani Anda</p>
+            </div>
+        </div>
+    </div>
 
     <!-- Footer -->
     <footer class="w-full py-8 text-center mt-auto border-t border-slate-200">
@@ -189,6 +272,28 @@
             if(dateElement) dateElement.textContent = dateString;
             if(yearElement) yearElement.textContent = now.getFullYear();
         }
+
+        /**
+         * Fungsi untuk membuka/menutup Modal
+         */
+        function toggleModal() {
+            const modal = document.getElementById('contactModal');
+            if (modal.classList.contains('modal-hidden')) {
+                modal.classList.remove('modal-hidden');
+                document.body.style.overflow = 'hidden'; // Disable scroll
+            } else {
+                modal.classList.add('modal-hidden');
+                document.body.style.overflow = ''; // Enable scroll
+            }
+        }
+
+        // Tutup modal jika user klik di luar area konten modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('contactModal');
+            if (event.target == modal) {
+                toggleModal();
+            }
+        };
 
         // Jalankan setiap detik
         setInterval(updateDateTime, 1000);
