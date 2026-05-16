@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tarik Tambang Matematika - YoriApp</title>
+  <style>
+    :root {
+      --bg-color: #e3f2fd;
+      --card-bg: #ffffff;
+      --p1-color: #1a237e;
+      --p2-color: #b71c1c;
+      --btn-gray: #f5f5f5;
+      --btn-red: #f44336;
+      --btn-blue: #0288d1;
+      --btn-green: #4caf50;
+      --text-main: #333;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #607d8b;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      transition: background-color 0.5s;
+    }
+
+    body.in-game {
+      background-color: var(--bg-color);
+    }
+
+    /* --- KOTAK MODAL (Welcome & Menu) --- */
+    .modal-container {
+      margin: auto;
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      text-align: center;
+      max-width: 800px;
+      width: 95%;
+      max-height: 95vh;
+      overflow-y: auto;
+    }
+
+    h1, h2 { color: var(--text-main); margin-top: 0; }
+    
+    .btn-oke {
+      background-color: var(--btn-green);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: 0.2s;
+    }
+    .btn-oke:hover { background-color: #388e3c; }
+
+    /* --- GRID MENU (5 Kolom x 4 Baris) --- */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .menu-btn {
+      background: var(--btn-gray);
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px 5px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s;
+      min-height: 90px;
+    }
+    .menu-btn:hover { background: #e3f2fd; border-color: var(--btn-blue); }
+    .menu-btn:active { transform: scale(0.95); }
+    
+    .menu-icon { font-size: 2rem; font-weight: bold; margin-bottom: 5px; color: #424242; }
+    .menu-label { font-size: 0.75rem; font-weight: bold; color: #616161; text-align: center; }
+
+    /* Responsif untuk layar kecil */
+    @media (max-width: 600px) {
+      .menu-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* --- GAME LAYOUT --- */
+    #game-screen {
+      display: none;
+      height: 100%;
+      flex-direction: column;
+    }
+
+    .game-header {
+      text-align: center;
+      padding: 15px;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--text-main);
+    }
+
+    .game-area {
+      display: flex;
+      flex: 1;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    /* Papan Pemain */
+    .player-board {
+      background: var(--card-bg);
+      border-radius: 10px;
+      width: 250px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .question-box {
+      padding: 15px;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: white;
+      text-align: center;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .p1 .question-box { background-color: var(--p1-color); }
+    .p2 .question-box { background-color: var(--p2-color); }
+
+    .input-box {
+      background: white;
+      margin: 10px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1.5rem;
+      text-align: center;
+      min-height: 45px;
+      font-weight: bold;
+    }
+
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+      padding: 10px;
+    }
+
+    .numpad button {
+      padding: 15px;
+      font-size: 1.2rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      background: var(--btn-gray);
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .numpad button:active { background: #d5d5d5; }
+    .btn-c { background: var(--btn-red) !important; color: white; }
+    .btn-go { background: var(--btn-blue) !important; color: white; }
+
+    /* --- TARIK TAMBANG VISUAL --- */
+    .tug-of-war-container {
+      flex: 1;
+      position: relative;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 20px;
+    }
+
+    .rope-bg {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      background-color: #d7ccc8;
+      z-index: 1;
+    }
+
+    .center-line {
+      position: absolute;
+      height: 100%;
+      width: 2px;
+      background-color: #9e9e9e;
+      z-index: 0;
+    }
+
+    .rope-group {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 220px;
+      z-index: 2;
+      transition: transform 0.3s ease-in-out;
+      transform: translateX(0px);
+    }
+
+    .rope-bar {
+      position: absolute;
+      width: 100%;
+      height: 12px;
+      background-color: #8d6e63;
+      z-index: -1;
+    }
+
+    .knot {
+      width: 20px;
+      height: 30px;
+      background-color: yellow;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 2px solid #5d4037;
+    }
+
+    .character {
+      font-size: 4rem;
+      user-select: none;
+    }
+
+    .game-footer {
+      text-align: center;
+      padding: 15px;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .app-footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #eeeeee;
+      padding: 8px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #616161;
+      z-index: 100;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- 1. WELCOME SCREEN -->
+  <div id="welcome-screen" class="modal-container">
+    <h1>TARIK TAMBANG MATEMATIKA</h1>
+    <p><strong>Permainan interaktif untuk melatih kecepatan berhitung.</strong></p>
+    <p style="font-size: 0.9rem;">Boleh digunakan di smartphone/tablet dengan view landscape/mendatar atau Interactive Flat Panel (IFP).</p>
+    <button class="btn-oke" onclick="showScreen('menu-screen')">Mulai (Oke)</button>
+  </div>
+
+  <!-- 2. MENU SCREEN (Full 20 Mode) -->
+  <div id="menu-screen" class="modal-container" style="display:none;">
+    <h2>Pilih Mode Permainan</h2>
+    <div class="menu-grid">
+      <!-- Baris 1 -->
+      <div class="menu-btn" onclick="startGame('tambah')">
+        <div class="menu-icon">➕</div><div class="menu-label">Tambah</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('kurang')">
+        <div class="menu-icon">➖</div><div class="menu-label">Kurang</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('kali')">
+        <div class="menu-icon">✖️</div><div class="menu-label">Kali</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('bagi')">
+        <div class="menu-icon">➗</div><div class="menu-label">Bagi</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('campuran_dasar')">
+        <div class="menu-icon">±</div><div class="menu-label">+-x÷</div>
+      </div>
+
+      <!-- Baris 2 -->
+      <div class="menu-btn" onclick="startGame('pangkat2')">
+        <div class="menu-icon">x²</div><div class="menu-label">Pangkat 2</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('pangkat3')">
+        <div class="menu-icon">x³</div><div class="menu-label">Pangkat 3</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('akar2')">
+        <div class="menu-icon">√</div><div class="menu-label">Akar</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('akar3')">
+        <div class="menu-icon">∛</div><div class="menu-label">Akar Pangkat 3</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('campuran_kompleks')">
+        <div class="menu-icon">?</div><div class="menu-label">+-x÷x²√</div>
+      </div>
+
+      <!-- Baris 3 -->
+      <div class="menu-btn" onclick="startGame('tambah2')">
+        <div class="menu-icon">+2</div><div class="menu-label">2 digit</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('kurang2')">
+        <div class="menu-icon">-2</div><div class="menu-label">-2 digit</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('tambah_kurang')">
+        <div class="menu-icon">+-</div><div class="menu-label">Tambah Kurang</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('kali_bagi')">
+        <div class="menu-icon">×÷</div><div class="menu-label">Kali Bagi</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('persen')">
+        <div class="menu-icon">%</div><div class="menu-label">Persen</div>
+      </div>
+
+      <!-- Baris 4 -->
+      <div class="menu-btn" onclick="startGame('fpb')">
+        <div class="menu-icon">FPB</div><div class="menu-label">FPB</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('kpk')">
+        <div class="menu-icon">KPK</div><div class="menu-label">KPK</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('waktu')">
+        <div class="menu-icon">🕒</div><div class="menu-label">Waktu</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('jarak')">
+        <div class="menu-icon">📏</div><div class="menu-label">Jarak</div>
+      </div>
+      <div class="menu-btn" onclick="startGame('buah')">
+        <div class="menu-icon">🍉</div><div class="menu-label">Hitung Buah</div>
+      </div>
+    </div>
+    <button class="btn-oke" style="background:#f44336;" onclick="showScreen('welcome-screen')">Kembali</button>
+  </div>
+
+  <!-- 3. GAME SCREEN -->
+  <div id="game-screen">
+    <div class="game-header">Tarik Tambang Matematika</div>
+    
+    <div class="game-area">
+      <!-- Player 1 Board -->
+      <div class="player-board p1">
+        <div class="question-box" id="q-p1"></div>
+        <div class="input-box" id="in-p1"></div>
+        <div class="numpad">
+          <button onclick="pressKey(1, '1')">1</button>
+          <button onclick="pressKey(1, '2')">2</button>
+          <button onclick="pressKey(1, '3')">3</button>
+          <button onclick="pressKey(1, '4')">4</button>
+          <button onclick="pressKey(1, '5')">5</button>
+          <button onclick="pressKey(1, '6')">6</button>
+          <button onclick="pressKey(1, '7')">7</button>
+          <button onclick="pressKey(1, '8')">8</button>
+          <button onclick="pressKey(1, '9')">9</button>
+          <button class="btn-c" onclick="pressKey(1, 'C')">C</button>
+          <button onclick="pressKey(1, '0')">0</button>
+          <button class="btn-go" onclick="pressKey(1, 'Go')">Go</button>
+        </div>
+      </div>
+
+      <!-- Tarik Tambang Area -->
+      <div class="tug-of-war-container">
+        <div class="center-line"></div>
+        <div class="rope-bg"></div>
+        <div class="rope-group" id="rope-group">
+          <div class="rope-bar"></div>
+          <div class="knot"></div>
+          <div class="character">🥷🏻</div>
+          <div class="character">🥷🏻</div>
+        </div>
+      </div>
+
+      <!-- Player 2 Board -->
+      <div class="player-board p2">
+        <div class="question-box" id="q-p2"></div>
+        <div class="input-box" id="in-p2"></div>
+        <div class="numpad">
+          <button onclick="pressKey(2, '1')">1</button>
+          <button onclick="pressKey(2, '2')">2</button>
+          <button onclick="pressKey(2, '3')">3</button>
+          <button onclick="pressKey(2, '4')">4</button>
+          <button onclick="pressKey(2, '5')">5</button>
+          <button onclick="pressKey(2, '6')">6</button>
+          <button onclick="pressKey(2, '7')">7</button>
+          <button onclick="pressKey(2, '8')">8</button>
+          <button onclick="pressKey(2, '9')">9</button>
+          <button class="btn-c" onclick="pressKey(2, 'C')">C</button>
+          <button onclick="pressKey(2, '0')">0</button>
+          <button class="btn-go" onclick="pressKey(2, 'Go')">Go</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-footer">
+      <p id="game-status">Jawab soal untuk menarik tali!</p>
+      <button onclick="endGame()" style="padding: 8px 20px; cursor: pointer; border-radius: 5px; border: 1px solid #ccc; background: white;">Kembali ke Menu</button>
+    </div>
+  </div>
+
+  <div class="app-footer">
+    Creator: YoriApp | Tarik Tambang Matematika
+  </div>
+
+  <script>
+    // --- STATE ---
+    let currentMode = '';
+    let tugPosition = 0; 
+    const WIN_THRESHOLD = 5; 
+    const MOVE_STEP = 30; 
+    let ansP1 = 0;
+    let ansP2 = 0;
+
+    // --- MATH HELPERS ---
+    function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+    function lcm(a, b) { return (a * b) / gcd(a, b); }
+    function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1) + min); }
+
+    // --- NAVIGATION ---
+    function showScreen(screenId) {
+      document.getElementById('welcome-screen').style.display = 'none';
+      document.getElementById('menu-screen').style.display = 'none';
+      document.getElementById('game-screen').style.display = 'none';
+      
+      document.getElementById(screenId).style.display = (screenId === 'game-screen') ? 'flex' : 'block';
+      document.body.classList.toggle('in-game', screenId === 'game-screen');
+    }
+
+    function startGame(mode) {
+      currentMode = mode;
+      tugPosition = 0;
+      updateRopePosition();
+      document.getElementById('in-p1').innerText = '';
+      document.getElementById('in-p2').innerText = '';
+      generateQuestion(1);
+      generateQuestion(2);
+      showScreen('game-screen');
+    }
+
+    function endGame() { showScreen('menu-screen'); }
+
+    // --- LOGIKA GENERATOR SOAL 20 MODE ---
+    function generateQuestion(player) {
+      let qText = "";
+      let answer = 0;
+      let activeMode = currentMode;
+
+      // Handle Random Mode Selections
+      if (activeMode === 'campuran_dasar') {
+        const modes = ['tambah', 'kurang', 'kali', 'bagi'];
+        activeMode = modes[randomInt(0, 3)];
+      } else if (activeMode === 'campuran_kompleks') {
+        const modes = ['tambah', 'kurang', 'kali', 'bagi', 'pangkat2', 'akar2'];
+        activeMode = modes[randomInt(0, 5)];
+      } else if (activeMode === 'tambah_kurang') {
+        activeMode = randomInt(0, 1) === 0 ? 'tambah2' : 'kurang2';
+      } else if (activeMode === 'kali_bagi') {
+        activeMode = randomInt(0, 1) === 0 ? 'kali2' : 'bagi2';
+      }
+
+      switch (activeMode) {
+        case 'tambah':
+          let a1 = randomInt(1, 20), b1 = randomInt(1, 20);
+          qText = `${a1} + ${b1} = ?`;
+          answer = a1 + b1;
+          break;
+        case 'kurang':
+          let a2 = randomInt(10, 30), b2 = randomInt(1, a2);
+          qText = `${a2} - ${b2} = ?`;
+          answer = a2 - b2;
+          break;
+        case 'kali':
+          let a3 = randomInt(2, 10), b3 = randomInt(2, 10);
+          qText = `${a3} × ${b3} = ?`;
+          answer = a3 * b3;
+          break;
+        case 'bagi':
+          let b4 = randomInt(2, 10), ans4 = randomInt(2, 10);
+          qText = `${b4 * ans4} ÷ ${b4} = ?`;
+          answer = ans4;
+          break;
+        case 'pangkat2':
+          let n2 = randomInt(2, 15);
+          qText = `${n2}² = ?`;
+          answer = n2 * n2;
+          break;
+        case 'pangkat3':
+          let n3 = randomInt(2, 10);
+          qText = `${n3}³ = ?`;
+          answer = n3 * n3 * n3;
+          break;
+        case 'akar2':
+          let ansRt2 = randomInt(2, 15);
+          qText = `√${ansRt2 * ansRt2} = ?`;
+          answer = ansRt2;
+          break;
+        case 'akar3':
+          let ansRt3 = randomInt(2, 10);
+          qText = `∛${ansRt3 * ansRt3 * ansRt3} = ?`;
+          answer = ansRt3;
+          break;
+        case 'tambah2':
+          let a5 = randomInt(10, 99), b5 = randomInt(10, 99);
+          qText = `${a5} + ${b5} = ?`;
+          answer = a5 + b5;
+          break;
+        case 'kurang2':
+          let a6 = randomInt(20, 99), b6 = randomInt(10, a6);
+          qText = `${a6} - ${b6} = ?`;
+          answer = a6 - b6;
+          break;
+        case 'kali2':
+          let a7 = randomInt(11, 25), b7 = randomInt(2, 9);
+          qText = `${a7} × ${b7} = ?`;
+          answer = a7 * b7;
+          break;
+        case 'bagi2':
+          let b8 = randomInt(2, 9), ans8 = randomInt(11, 30);
+          qText = `${b8 * ans8} ÷ ${b8} = ?`;
+          answer = ans8;
+          break;
+        case 'persen':
+          let persentase = [10, 20, 25, 50, 75];
+          let p = persentase[randomInt(0, 4)];
+          let base = randomInt(1, 10) * 20; 
+          qText = `${p}% dari ${base}`;
+          answer = (p * base) / 100;
+          break;
+        case 'fpb':
+          let fpbAns = randomInt(2, 10);
+          let m1 = randomInt(1, 5), m2 = randomInt(1, 5);
+          while (m1 === m2 || gcd(m1, m2) !== 1) { m1 = randomInt(1, 5); m2 = randomInt(1, 5); }
+          qText = `FPB(${fpbAns*m1}, ${fpbAns*m2})`;
+          answer = fpbAns;
+          break;
+        case 'kpk':
+          let k1 = randomInt(2, 8), k2 = randomInt(2, 8);
+          while (k1 === k2) k2 = randomInt(2, 8);
+          qText = `KPK(${k1}, ${k2})`;
+          answer = lcm(k1, k2);
+          break;
+        case 'waktu':
+          if (randomInt(0, 1) === 0) {
+            let jam = randomInt(1, 5);
+            qText = `${jam} Jam = ? Mnt`;
+            answer = jam * 60;
+          } else {
+            let mnt = randomInt(1, 5);
+            qText = `${mnt} Mnt = ? Dtk`;
+            answer = mnt * 60;
+          }
+          break;
+        case 'jarak':
+          if (randomInt(0, 1) === 0) {
+            let km = randomInt(1, 10);
+            qText = `${km} km = ? m`;
+            answer = km * 1000;
+          } else {
+            let m = randomInt(1, 15);
+            qText = `${m} m = ? cm`;
+            answer = m * 100;
+          }
+          break;
+        case 'buah':
+          let fruits = ['🍓', '🥝', '🍉', '🍎', '🍇'];
+          let selectedFruit = fruits[randomInt(0, fruits.length - 1)];
+          let count = randomInt(1, 15);
+          qText = `<div style="font-size:1.5rem; line-height:1.2;">`;
+          for(let i=0; i<count; i++) qText += selectedFruit + " ";
+          qText += `</div>`;
+          answer = count;
+          break;
+      }
+
+      if (player === 1) {
+        document.getElementById('q-p1').innerHTML = qText;
+        ansP1 = answer;
+      } else {
+        document.getElementById('q-p2').innerHTML = qText;
+        ansP2 = answer;
+      }
+    }
+
+    // --- INTERAKSI INPUT ---
+    function pressKey(player, key) {
+      let inputField = document.getElementById(player === 1 ? 'in-p1' : 'in-p2');
+      let currentVal = inputField.innerText;
+
+      if (key === 'C') {
+        inputField.innerText = '';
+      } else if (key === 'Go') {
+        checkAnswer(player, parseInt(currentVal));
+      } else {
+        if(currentVal.length < 5) {
+          inputField.innerText = currentVal + key;
+        }
+      }
+    }
+
+    function checkAnswer(player, inputAnswer) {
+      if (isNaN(inputAnswer)) return;
+
+      let correctAnswer = (player === 1) ? ansP1 : ansP2;
+      let inputField = document.getElementById(player === 1 ? 'in-p1' : 'in-p2');
+
+      if (inputAnswer === correctAnswer) {
+        // Tarik Tali jika benar
+        tugPosition += (player === 1) ? -1 : 1;
+        updateRopePosition();
+        
+        inputField.innerText = ''; 
+        generateQuestion(player); 
+        checkWin();
+      } else {
+        inputField.style.color = "red";
+        setTimeout(() => {
+          inputField.innerText = '';
+          inputField.style.color = "black";
+        }, 500);
+      }
+    }
+
+    // --- VISUAL & WINNER ---
+    function updateRopePosition() {
+      let rope = document.getElementById('rope-group');
+      rope.style.transform = `translateX(${tugPosition * MOVE_STEP}px)`;
+    }
+
+    function checkWin() {
+      if (tugPosition <= -WIN_THRESHOLD) {
+        setTimeout(() => { alert("🎉 PEMAIN KIRI MENANG! 🎉"); endGame(); }, 200);
+      } else if (tugPosition >= WIN_THRESHOLD) {
+        setTimeout(() => { alert("🎉 PEMAIN KANAN MENANG! 🎉"); endGame(); }, 200);
+      }
+    }
+  </script>
+</body>
+</html>
