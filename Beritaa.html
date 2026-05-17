@@ -86,15 +86,11 @@
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-12 items-start">
             
             <!-- Left Side Column: Search, News List & Pagination -->
-            <!-- 
-               PANDUAN MENYESUAIKAN TINGGI DAFTAR KIRI:
-               Sesuaikan max-h pada listContainer agar seimbang dengan area PDF di kanan.
-            -->
             <div class="lg:col-span-4 xl:col-span-3 space-y-4 lg:sticky lg:top-24">
                 <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-gray-150 dark:border-slate-850 shadow-sm space-y-3.5">
                     <h2 class="text-base font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                         <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1M19 20a2 2 0 002-2V8a2 2 0 00-2-2h-5M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h7m5 4v12m-3-12h.01M9 10h.01M9 14h4"/></svg>
-                        Daftar Pengumuman
+                        Daftar Berita & Pengumuman
                     </h2>
                     
                     <!-- Search Input Box -->
@@ -102,7 +98,7 @@
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         </span>
-                        <input type="text" id="searchInput" placeholder="Cari judul edaran..." class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50/50 dark:border-slate-800 dark:bg-slate-950/50 focus:border-blue-500 focus:bg-white dark:focus:border-blue-500 dark:focus:bg-slate-950 focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500 text-gray-800 dark:text-gray-200 shadow-inner" />
+                        <input type="text" id="searchInput" placeholder="Cari judul..." class="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50/50 dark:border-slate-800 dark:bg-slate-950/50 focus:border-blue-500 focus:bg-white dark:focus:border-blue-500 dark:focus:bg-slate-950 focus:outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-slate-500 text-gray-800 dark:text-gray-200 shadow-inner" />
                     </div>
                 </div>
 
@@ -113,8 +109,8 @@
                 <div id="paginationContainer" class="flex items-center justify-center gap-2 pt-1"></div>
             </div>
 
-            <!-- Right Side Column (9 cols on XL): Document View Panel with maximized display surface -->
-            <div id="detailContainer" class="lg:col-span-8 xl:col-span-9 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-gray-150 dark:border-slate-850 shadow-sm flex flex-col min-h-[700px] lg:min-h-[1050px] transition-all">
+            <!-- Right Side Column: Document View Panel dengan container yang dapat memanjang sesuai tinggi PDF (tanpa scroll internal) -->
+            <div id="detailContainer" class="lg:col-span-8 xl:col-span-9 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl border border-gray-150 dark:border-slate-850 shadow-sm flex flex-col transition-all">
                 <!-- Fallback view when no news is loaded -->
                 <div class="flex-1 flex items-center justify-center text-gray-400 dark:text-slate-500 flex-col py-12">
                     <svg class="w-16 h-16 mb-4 text-gray-200 dark:text-slate-800" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg>
@@ -390,12 +386,14 @@
                 return;
             }
 
-            // PANDUAN RUANG / SPACE:
-            // - Jika ingin menambah tinggi penampil PDF, Anda cukup menaikkan nilai piksel kelas h-[...] berikut ini:
-            //   Contoh: Dari h-[850px] lg:h-[950px] xl:h-[1050px] diubah menjadi h-[1000px] lg:h-[1200px] xl:h-[1300px]
+            // ================================================================
+            // MODIFIKASI UTAMA: Menghapus batasan tinggi dan overflow scroll internal pada container PDF.
+            // Agar seluruh halaman PDF tampil penuh tanpa scroll manual di viewer.
+            // Cukup scroll halaman web secara keseluruhan untuk melihat dokumen.
+            // ================================================================
             const pdfViewerContent = `
                 <div class="w-full flex flex-col rounded-2xl overflow-hidden border border-gray-200 dark:border-slate-800 shadow-sm bg-gray-50 dark:bg-slate-950 relative">
-                    <div class="relative w-full h-[650px] md:h-[850px] lg:h-[950px] xl:h-[1050px] overflow-y-auto bg-gray-100 dark:bg-slate-950 flex flex-col items-center p-1.5 sm:p-2.5 custom-scrollbar" id="pdfCanvasContainer">
+                    <div class="relative w-full bg-gray-100 dark:bg-slate-950 flex flex-col items-center p-1.5 sm:p-2.5" id="pdfCanvasContainer">
                         
                         <!-- Security Warning UI when blocked by CORS -->
                         <div id="pdfErrorAlert" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-slate-900 p-6 text-center z-20">
@@ -461,7 +459,7 @@
                 </div>
                 ` : ''}
 
-                <!-- Container Multi Canvas Halaman PDF -->
+                <!-- Container Multi Canvas Halaman PDF (tanpa batasan tinggi/overflow) -->
                 <div class="w-full mb-6">
                     ${pdfViewerContent}
                 </div>
