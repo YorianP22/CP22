@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Informasi Korwil Sine</title>
+    <!-- Import Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Mencegah seleksi pada iframe edge */
+        .iframe-overlay { pointer-events: none; }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] font-sans text-gray-800 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center shadow-sm">
+        <div class="flex items-center gap-4">
+            <!-- Logo yang baru -->
+            <img src="https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true" alt="Logo Korwil Sine" class="w-12 h-12 object-contain" />
+            <div>
+                <h1 class="text-xl font-bold text-gray-900 tracking-tight">KORWILDIKBUD KEC. SINE</h1>
+                <!-- Teks diubah menjadi Pusat Informasi -->
+                <p class="text-sm text-gray-500 font-medium tracking-widest text-[10px] uppercase">Pusat Informasi</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-6">
+        
+        <!-- Left Column - List Berita -->
+        <div class="w-full lg:w-[400px] flex-shrink-0 flex flex-col gap-4">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
+                <h2 class="text-xl font-bold mb-4 text-gray-900">Daftar Berita</h2>
+                
+                <!-- Search Box -->
+                <div class="relative mb-5">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Cari berita..."
+                        class="w-full pl-4 pr-10 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    />
+                    <!-- Search Icon -->
+                    <svg class="absolute right-3 top-3 text-gray-400 w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+
+                <!-- List Items Container -->
+                <div id="listContainer" class="flex flex-col gap-3">
+                    <!-- Item akan dirender oleh JavaScript disini -->
+                </div>
+
+                <!-- Pagination Controls Container -->
+                <div id="paginationContainer" class="flex items-center justify-center gap-1 mt-6 pt-4 border-t border-gray-100">
+                    <!-- Paginasi akan dirender oleh JavaScript disini -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Content Detail -->
+        <div class="flex-1 bg-white rounded-xl shadow-sm border border-gray-100 p-6 md:p-8 lg:p-10 flex flex-col min-h-[700px]" id="detailContainer">
+            <!-- Detail akan dirender oleh JavaScript disini -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-10 text-sm text-gray-500 mt-10">
+        <h5 class="font-bold text-gray-700 tracking-widest mb-2">ARSIP DIGITAL KORWIL SINE</h5>
+        <p>© 2026 KorwilDikbud Kecamatan Sine. All rights reserved.</p>
+    </footer>
+
+    <!-- Script Logika Aplikasi -->
+    <script>
+        // ==========================================
+        // AREA PENGISIAN DATA (SILAHKAN EDIT DISINI)
+        // ==========================================
+        const initialNewsData = [
+          {
+            id: 1,
+            title: "Edaran Informasi Akademik",
+            url: "https://drive.google.com/file/d/16--6P_eKy564h-Adlbys6NCiB-V9LlAK/preview",
+            date: "17 Mei 2026",
+            time: "07:13",
+            status: "Dipublikasikan",
+            authorName: "Admin Korwil Sine",
+            authorRole: "Penulis",
+            authorAvatarUrl: "",
+            thumbnailUrl: "https://images.unsplash.com/photo-1568225367119-4ebcebc5b12a?w=500&q=80",
+            description: "Berikut adalah Surat Edaran mengenai pelaksanaan kegiatan sekolah di Kecamatan Sine."
+          },
+          {
+            id: 2,
+            title: "Pelaksanaan Jadwal Kegiatan",
+            url: "https://drive.google.com/file/d/1STs5ramFZD-qLAss8lk-C5QmX89dc9a0/preview",
+            date: "16 Mei 2026",
+            time: "09:30",
+            status: "Dipublikasikan",
+            authorName: "Admin Korwil Sine",
+            authorRole: "Penulis",
+            authorAvatarUrl: "",
+            thumbnailUrl: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=500&q=80",
+            description: "Jadwal lengkap pelaksanaan kegiatan untuk seluruh sekolah di Kecamatan Sine."
+          },
+          {
+            id: 3,
+            title: "Undangan Rapat Kordinasi",
+            url: "https://drive.google.com/file/d/1y4P7Yo3wTd333ma4G7wVeQEAeKtk_fmI/preview",
+            date: "15 Mei 2026",
+            time: "14:00",
+            status: "Dipublikasikan",
+            authorName: "Admin Korwil Sine",
+            authorRole: "Penulis",
+            authorAvatarUrl: "",
+            thumbnailUrl: "https://images.unsplash.com/photo-1577563908411-5077b6dc7624?w=500&q=80",
+            description: "Undangan resmi untuk kegiatan rapat kordinasi evaluasi kinerja."
+          },
+          {
+            id: 4,
+            title: "Daftar Sekolah Penerima Bantuan T.A 2025/2026",
+            url: "https://drive.google.com/file/d/1T244Hkq7rAfaQ2QHtomvKwm5MUydV2G4/preview",
+            date: "14 Mei 2026",
+            time: "10:15",
+            status: "Dipublikasikan",
+            authorName: "Admin Korwil Sine",
+            authorRole: "Penulis",
+            authorAvatarUrl: "",
+            thumbnailUrl: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=500&q=80",
+            description: "Rekapitulasi daftar sekolah penerima bantuan operasional Tahun Ajaran 2025/2026."
+          }
+        ];
+        // ==========================================
+
+        // State variables
+        let searchQuery = "";
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let filteredData = [...initialNewsData];
+        let selectedItem = filteredData[0] || null;
+
+        // DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const listContainer = document.getElementById('listContainer');
+        const paginationContainer = document.getElementById('paginationContainer');
+        const detailContainer = document.getElementById('detailContainer');
+
+        // Event Listener untuk Search
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            currentPage = 1; // Reset ke halaman 1 saat mencari
+            updateState();
+        });
+
+        // Fungsi Global untuk memilih item (dipanggil dari onclick tombol)
+        window.selectItem = function(id) {
+            selectedItem = filteredData.find(item => item.id === id);
+            renderList();
+            renderDetail();
+        };
+
+        // Fungsi Global untuk pindah halaman
+        window.paginate = function(page) {
+            currentPage = page;
+            renderList();
+            renderPagination();
+        };
+
+        // Update state dan Render Ulang
+        function updateState() {
+            filteredData = initialNewsData.filter(item => 
+                item.title.toLowerCase().includes(searchQuery)
+            );
+            
+            // Jika item terpilih tidak ada di hasil pencarian, reset ke item pertama
+            if (!filteredData.find(item => item.id === selectedItem?.id)) {
+                selectedItem = filteredData.length > 0 ? filteredData[0] : null;
+            }
+
+            renderList();
+            renderPagination();
+            renderDetail();
+        }
+
+        function renderList() {
+            const indexOfLastItem = currentPage * itemsPerPage;
+            const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+            const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+            if (currentItems.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-10 text-gray-400 text-sm">Data tidak ditemukan.</div>`;
+                return;
+            }
+
+            let listHTML = '';
+            currentItems.forEach(item => {
+                const isSelected = selectedItem && selectedItem.id === item.id;
+                const buttonClass = isSelected 
+                    ? 'bg-[#F0F7FF] border-blue-400 shadow-sm relative' 
+                    : 'bg-white border-gray-100 hover:border-gray-300 hover:bg-gray-50';
+                
+                const titleClass = isSelected ? 'text-gray-900' : 'text-gray-700';
+                const indicatorHTML = isSelected ? `<div class="w-2.5 h-2.5 rounded-full bg-blue-600 absolute right-4"></div>` : '';
+
+                listHTML += `
+                    <button onclick="selectItem(${item.id})" class="flex items-center gap-4 p-3 rounded-lg border transition-all text-left w-full ${buttonClass}">
+                        <div class="w-16 h-12 rounded bg-gray-200 overflow-hidden flex-shrink-0">
+                            <img src="${item.thumbnailUrl}" alt="thumb" class="w-full h-full object-cover" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-sm truncate ${titleClass}">${item.title}</h3>
+                            <p class="text-xs text-gray-500 mt-1">${item.date} • ${item.time}</p>
+                        </div>
+                        ${indicatorHTML}
+                    </button>
+                `;
+            });
+            listContainer.innerHTML = listHTML;
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+
+            // Tombol Prev
+            const prevDisabled = currentPage === 1 ? 'disabled opacity-50 cursor-not-allowed' : '';
+            paginationHTML += `
+                <button onclick="paginate(Math.max(1, ${currentPage - 1}))" ${prevDisabled} class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+            `;
+
+            // Angka Halaman
+            for (let i = 1; i <= totalPages; i++) {
+                const isActive = currentPage === i;
+                const pageClass = isActive 
+                    ? 'bg-blue-600 border-blue-600 text-white' 
+                    : 'border-gray-200 text-gray-600 hover:bg-gray-50';
+                
+                paginationHTML += `
+                    <button onclick="paginate(${i})" class="w-8 h-8 flex items-center justify-center rounded border text-sm font-medium ${pageClass}">
+                        ${i}
+                    </button>
+                `;
+            }
+
+            // Tombol Next
+            const nextDisabled = currentPage === totalPages ? 'disabled opacity-50 cursor-not-allowed' : '';
+            paginationHTML += `
+                <button onclick="paginate(Math.min(${totalPages}, ${currentPage + 1}))" ${nextDisabled} class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-600 hover:bg-gray-50">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+            `;
+
+            paginationContainer.innerHTML = paginationHTML;
+        }
+
+        function renderDetail() {
+            if (!selectedItem) {
+                detailContainer.innerHTML = `
+                    <div class="flex-1 flex items-center justify-center text-gray-400 flex-col">
+                        <svg class="w-16 h-16 mb-4 text-gray-200" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                        <p>Pilih berita untuk menampilkan detail</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const isGoogleDrive = selectedItem.url.includes('drive.google.com');
+            const iframeContent = isGoogleDrive 
+                ? `
+                    <div class="absolute inset-0 overflow-hidden rounded-xl bg-white">
+                        <iframe 
+                            src="${selectedItem.url}" 
+                            class="absolute top-[-56px] left-0 w-full h-[calc(100%+56px)] border-0" 
+                            allow="autoplay"
+                            title="Document Preview"
+                        ></iframe>
+                        <div class="absolute top-0 left-0 right-0 h-2 bg-transparent z-10 iframe-overlay"></div>
+                    </div>
+                  ` 
+                : `
+                    <div class="flex flex-col items-center justify-center h-full min-h-[400px] text-gray-400">
+                        <svg class="w-16 h-16 mb-4 text-gray-300" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                        <p>Pratinjau dokumen tidak tersedia.</p>
+                    </div>
+                  `;
+
+            const avatarHTML = selectedItem.authorAvatarUrl 
+                ? `<img src="${selectedItem.authorAvatarUrl}" alt="${selectedItem.authorName}" class="w-full h-full object-cover" />`
+                : `<svg class="w-6 h-6 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+            detailContainer.innerHTML = `
+                <!-- Meta Top -->
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 pb-4 mb-6">
+                    <div class="flex items-center gap-2 text-sm text-gray-500">
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        <span>${selectedItem.date} • ${selectedItem.time}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-medium border border-green-200">
+                        <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                        ${selectedItem.status}
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-6">
+                    ${selectedItem.title}
+                </h1>
+
+                <!-- Main Content Area - Google Drive Iframe Tersembunyi Headernya -->
+                <div class="relative w-full bg-white rounded-xl border border-gray-200 overflow-hidden mb-6 flex-1 min-h-[500px]" oncontextmenu="return false;">
+                    ${iframeContent}
+                </div>
+
+                <!-- Description -->
+                ${selectedItem.description ? `
+                <div class="text-gray-600 mb-8 leading-relaxed">
+                    <p>${selectedItem.description}</p>
+                </div>
+                ` : ''}
+
+                <!-- Author Info -->
+                <div class="mt-auto pt-6 border-t border-gray-100 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center overflow-hidden">
+                        ${avatarHTML}
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-sm">${selectedItem.authorName}</h4>
+                        <p class="text-xs text-gray-500">${selectedItem.authorRole}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Inisialisasi awal
+        updateState();
+
+    </script>
+</body>
+</html>
