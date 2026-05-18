@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets URL Converter - Yor.iAPP</title>
+    <!-- Tailwind CSS untuk UI Modern & Clean -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Lucide Icons untuk Icon -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 antialiased font-sans">
+
+    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-6">
+            <div class="bg-emerald-50 text-emerald-600 p-2.5 rounded-xl">
+                <i data-lucide="file-spreadsheet" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <h1 class="text-xl font-bold text-gray-900">Google Sheets Direct Link Generator</h1>
+                <p class="text-xs text-gray-500 mt-0.5">Ubah link Google Sheets menjadi link unduhan langsung (.xlsx)</p>
+            </div>
+        </div>
+
+        <!-- Input Section -->
+        <div class="space-y-4">
+            <div>
+                <label for="inputUrl" class="block text-sm font-semibold text-gray-700 mb-1.5">Masukkan Link Google Sheets</label>
+                <div class="relative">
+                    <input type="text" id="inputUrl" 
+                        placeholder="Paste link /edit... atau /pubhtml di sini" 
+                        class="w-full pl-4 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all placeholder:text-gray-400">
+                    <button id="clearBtn" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button id="convertBtn" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-3 px-4 rounded-xl shadow-sm transition-colors flex items-center justify-center gap-2 cursor-pointer text-sm">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Convert Link
+            </button>
+        </div>
+
+        <!-- Result Section (Hidden by Default) -->
+        <div id="resultContainer" class="mt-8 pt-6 border-t border-gray-100 hidden opacity-0 transition-opacity duration-300">
+            <h2 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-600"></i> Hasil Konversi
+            </h2>
+            
+            <div class="bg-gray-50 rounded-xl p-4 border border-gray-150 space-y-4">
+                <!-- Text URL Output -->
+                <div>
+                    <span class="text-xs font-medium text-gray-400 block mb-1">RAW DIRECT LINK</span>
+                    <div class="flex gap-2">
+                        <input type="text" id="outputUrl" readonly 
+                            class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs font-mono text-gray-600 focus:outline-none">
+                        <button id="copyBtn" class="bg-white hover:bg-gray-100 border border-gray-200 p-2 rounded-lg text-gray-600 hover:text-gray-900 transition-colors cursor-pointer relative" title="Salin Link">
+                            <i data-lucide="copy" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                    <a id="downloadBtn" href="#" target="_blank" 
+                        class="flex-1 bg-gray-900 hover:bg-gray-800 text-white text-center text-xs font-semibold py-2.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+                        <i data-lucide="download" class="w-3.5 h-3.5"></i> Test Download File
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Error Message -->
+        <div id="errorMessage" class="mt-4 p-3 bg-red-50 border border-red-100 text-red-600 text-xs rounded-xl flex items-center gap-2 hidden">
+            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0"></i>
+            <span>Format URL tidak dikenali. Pastikan URL mengandung '/edit' atau '/pubhtml'.</span>
+        </div>
+    </div>
+
+    <script>
+        // Inisialisasi Lucide Icons
+        lucide.createIcons();
+
+        const inputUrl = document.getElementById('inputUrl');
+        const clearBtn = document.getElementById('clearBtn');
+        const convertBtn = document.getElementById('convertBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const outputUrl = document.getElementById('outputUrl');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const errorMessage = document.getElementById('errorMessage');
+
+        // Show/Hide tombol hapus input
+        inputUrl.addEventListener('input', () => {
+            clearBtn.classList.toggle('hidden', inputUrl.value === '');
+        });
+
+        clearBtn.addEventListener('click', () => {
+            inputUrl.value = '';
+            clearBtn.classList.add('hidden');
+            hideResult();
+        });
+
+        // Proses Konversi URL
+        convertBtn.addEventListener('click', () => {
+            const urlSrc = inputUrl.value.trim();
+            if (!urlSrc) return;
+
+            hideResult();
+            hideError();
+
+            let convertedUrl = '';
+
+            // Pola 1: Model Standard Editor (/spreadsheets/d/[ID]/edit)
+            if (urlSrc.includes('/spreadsheets/d/') && urlSrc.includes('/edit')) {
+                const basePart = urlSrc.split('/edit')[0];
+                
+                // Ambil GID jika ada
+                let gid = '';
+                const gidMatch = urlSrc.match(/[#&?]gid=([0-9]+)/);
+                if (gidMatch && gidMatch[1]) {
+                    gid = gidMatch[1];
+                }
+
+                convertedUrl = `${basePart}/export?format=xlsx`;
+                if (gid) {
+                    convertedUrl += `&gid=${gid}`;
+                }
+            } 
+            // Pola 2: Model Web Publish (/spreadsheets/d/e/[ID]/pubhtml)
+            else if (urlSrc.includes('/spreadsheets/d/e/') && urlSrc.includes('/pubhtml')) {
+                const basePart = urlSrc.split('/pubhtml')[0];
+                convertedUrl = `${basePart}/pub?output=xlsx`;
+            } 
+            // Jika format tidak sesuai
+            else {
+                showError();
+                return;
+            }
+
+            // Tampilkan Hasil
+            outputUrl.value = convertedUrl;
+            downloadBtn.href = convertedUrl;
+            showResult();
+        });
+
+        // Copy to Clipboard
+        copyBtn.addEventListener('click', () => {
+            outputUrl.select();
+            document.execCommand('copy');
+            
+            // Feedback UI setelah dicopy
+            const icon = copyBtn.querySelector('i');
+            copyBtn.innerHTML = '<i data-lucide="check" class="w-4 h-4 text-emerald-600"></i>';
+            lucide.createIcons();
+            
+            setTimeout(() => {
+                copyBtn.innerHTML = '<i data-lucide="copy" class="w-4 h-4"></i>';
+                lucide.createIcons();
+            }, 2000);
+        });
+
+        function showResult() {
+            resultContainer.classList.remove('hidden');
+            setTimeout(() => {
+                resultContainer.classList.add('opacity-100');
+            }, 10);
+        }
+
+        function hideResult() {
+            resultContainer.classList.remove('opacity-100');
+            resultContainer.classList.add('hidden');
+        }
+
+        function showError() {
+            errorMessage.classList.remove('hidden');
+        }
+
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
