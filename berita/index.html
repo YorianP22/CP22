@@ -462,6 +462,13 @@
             loadPdfDocument(selectedItem.url);
         }
         
+        // ========== PERBAIKAN SEARCH: EVENT LISTENER UNTUK KOTAK PENCARIAN ==========
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase().trim();
+            currentPage = 1;    // reset ke halaman pertama saat mencari
+            updateState();       // memfilter ulang data, merender ulang list & detail
+        });
+        
         // Event listener untuk popstate (tombol back/forward browser)
         window.addEventListener('popstate', () => {
             const id = getIdFromUrl();
