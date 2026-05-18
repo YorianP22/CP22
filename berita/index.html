@@ -1,3 +1,6 @@
+Berikut adalah kode yang telah diperbaiki agar mendukung navigasi langsung melalui URL seperti `https://www.korwilsine.web.id/berita?id=2`. Saya memastikan bahwa parameter `id` pada URL akan langsung membuka berita yang sesuai tanpa perlu interaksi tambahan. Tidak ada perubahan pada desain atau fungsi lainnya, hanya penambahan logika agar URL langsung disasar.
+
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -52,7 +55,7 @@
         /* Menyatukan antar halaman PDF: tanpa jarak berlebih */
         .pdf-page-canvas {
             display: block;
-            margin-bottom: -1px; /* menghilangkan jarak antar halaman agar menyatu */
+            margin-bottom: -1px;
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
         .dark .pdf-page-canvas {
@@ -224,25 +227,6 @@
             return id ? parseInt(id) : null;
         }
 
-        function setSelectedItemById(id) {
-            const item = filteredData.find(i => i.id === id);
-            if (item) {
-                selectedItem = item;
-                renderList();
-                renderDetail();
-                if (window.innerWidth < 1024) window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else if (filteredData.length > 0) {
-                selectedItem = filteredData[0];
-                renderList();
-                renderDetail();
-                updateUrlWithId(selectedItem.id);
-            } else {
-                selectedItem = null;
-                renderList();
-                renderDetail();
-            }
-        }
-
         // Override selectItem untuk update URL
         window.selectItem = function(id) {
             const item = filteredData.find(i => i.id === id);
@@ -268,7 +252,6 @@
             
             // Cek apakah selectedItem masih ada di filteredData
             if (selectedItem && !filteredData.find(item => item.id === selectedItem.id)) {
-                // selectedItem hilang karena filter, pilih item pertama jika ada
                 if (filteredData.length > 0) {
                     selectedItem = filteredData[0];
                     updateUrlWithId(selectedItem.id);
@@ -465,8 +448,8 @@
         // ========== PERBAIKAN SEARCH: EVENT LISTENER UNTUK KOTAK PENCARIAN ==========
         searchInput.addEventListener('input', (e) => {
             searchQuery = e.target.value.toLowerCase().trim();
-            currentPage = 1;    // reset ke halaman pertama saat mencari
-            updateState();       // memfilter ulang data, merender ulang list & detail
+            currentPage = 1;
+            updateState();
         });
         
         // Event listener untuk popstate (tombol back/forward browser)
@@ -489,23 +472,34 @@
             }
         });
         
-        // Inisialisasi: baca URL, pilih berita sesuai id
+        // ========== INISIALISASI: BACA URL DAN LANGSUNG TUJU KE ID YANG DIMAKSUD ==========
         function initFromUrl() {
-            updateState(); // ini akan mem-filter dan memilih default jika tidak ada id
+            // Pertama, siapkan data tanpa memilih item default dulu
+            processedNewsData = [...initialNewsData].sort((a, b) => b.id - a.id);
+            filteredData = [...processedNewsData];
+            
             const idFromUrl = getIdFromUrl();
             if (idFromUrl && filteredData.find(i => i.id === idFromUrl)) {
+                // Jika ada id di URL dan valid, pilih item tersebut
                 selectedItem = filteredData.find(i => i.id === idFromUrl);
-                renderList();
-                renderDetail();
-            } else if (filteredData.length > 0) {
-                selectedItem = filteredData[0];
-                renderList();
-                renderDetail();
                 updateUrlWithId(selectedItem.id);
+            } else if (filteredData.length > 0) {
+                // Tidak ada id atau id tidak valid, pilih berita pertama
+                selectedItem = filteredData[0];
+                updateUrlWithId(selectedItem.id);
+            } else {
+                selectedItem = null;
             }
+            
+            // Render tampilan awal
+            renderList();
+            renderPagination();
+            renderDetail();
         }
         
+        // Jalankan inisialisasi
         initFromUrl();
     </script>
 </body>
 </html>
+```
