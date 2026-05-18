@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tarik Tambang Matematika - Modern</title>
+  <title>Tarik Tambang Matematika - YoriAPP</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
@@ -38,17 +38,18 @@
       box-shadow: 0 4px 6px rgba(0,0,0,0.3);
     }
 
-    /* Animations */
-    @keyframes pull-left {
-      0% { transform: rotate(0deg) translateX(0); }
-      50% { transform: rotate(-15deg) translateX(-10px); }
-      100% { transform: rotate(0deg) translateX(0); }
+    /* Player Specific Pull Animations to handle flips correctly */
+    @keyframes p1-pull {
+      0% { transform: scaleX(1) rotate(0deg) translateX(0); }
+      50% { transform: scaleX(1) rotate(-15deg) translateX(-10px); }
+      100% { transform: scaleX(1) rotate(0deg) translateX(0); }
     }
     
-    @keyframes pull-right {
-      0% { transform: rotate(0deg) translateX(0); }
-      50% { transform: rotate(15deg) translateX(10px); }
-      100% { transform: rotate(0deg) translateX(0); }
+    @keyframes p2-pull {
+      /* P2 is flipped initially via scaleX(-1), so local -10px is visual right */
+      0% { transform: scaleX(-1) rotate(0deg) translateX(0); }
+      50% { transform: scaleX(-1) rotate(-15deg) translateX(-10px); }
+      100% { transform: scaleX(-1) rotate(0deg) translateX(0); }
     }
 
     @keyframes shake {
@@ -58,8 +59,8 @@
       75% { transform: translateX(-5px); }
     }
 
-    .anim-pull-l { animation: pull-left 0.4s ease; }
-    .anim-pull-r { animation: pull-right 0.4s ease; }
+    .anim-p1-pull { animation: p1-pull 0.4s ease; }
+    .anim-p2-pull { animation: p2-pull 0.4s ease; }
     .anim-shake { animation: shake 0.3s ease; color: #ef4444 !important; }
 
     /* Numpad Button Effects */
@@ -100,23 +101,32 @@
     <div class="cloud w-24 h-8 top-20" style="animation-duration: 18s; animation-delay: -5s;"></div>
   </div>
 
-  <div id="welcome-screen" class="z-10 bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl text-center max-w-lg w-[90%] transform transition-all">
+  <!-- Footer YoriAPP -->
+  <div class="fixed bottom-3 w-full flex justify-center z-50 pointer-events-none">
+    <div class="bg-white/90 backdrop-blur-md px-6 py-2 rounded-full shadow-lg border-2 border-white flex items-center gap-2">
+      <span class="text-xl">🌟</span>
+      <span class="font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">YoriAPP</span>
+      <span class="text-gray-500 font-bold text-sm hidden sm:inline">| Tarik Tambang Edukasi</span>
+    </div>
+  </div>
+
+  <div id="welcome-screen" class="z-10 bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl text-center max-w-lg w-[90%] transform transition-all mb-10">
     <div class="text-6xl mb-4">🏆</div>
     <h1 class="text-4xl font-black text-gray-800 mb-2 leading-tight">Tarik Tambang<br><span class="text-blue-600">Matematika</span></h1>
     <p class="text-gray-600 mb-6 font-semibold">Latih kecepatan berhitungmu dalam pertarungan sengit!</p>
-    <div class="bg-blue-50 p-4 rounded-xl mb-6 text-sm text-blue-800 text-left">
-      <ul class="list-disc pl-5 space-y-1">
-        <li>Cocok untuk Tablet / IFP (Landscape).</li>
-        <li>Mode Layar Penuh otomatis saat bermain.</li>
-        <li>Pemain yang menarik tali melewati batas menang!</li>
+    <div class="bg-blue-50 p-4 rounded-xl mb-6 text-sm text-blue-800 text-left border border-blue-200">
+      <ul class="list-disc pl-5 space-y-1 font-bold">
+        <li>Pemain yang menjawab benar akan menarik tambang ke arahnya.</li>
+        <li>Tarik tambang melewati garis merah untuk menang!</li>
+        <li>Bermainlah secara berhadapan dengan temanmu.</li>
       </ul>
     </div>
-    <button onclick="showScreen('menu-screen')" class="w-full bg-gradient-to-r from-green-400 to-green-600 text-white font-bold text-xl py-4 rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+    <button onclick="showScreen('menu-screen')" class="w-full bg-gradient-to-r from-green-400 to-green-600 text-white font-black text-xl py-4 rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all">
       Mulai Bermain
     </button>
   </div>
 
-  <div id="menu-screen" class="hidden z-10 bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl text-center w-[95%] max-w-4xl max-h-[90vh] flex flex-col">
+  <div id="menu-screen" class="hidden z-10 bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl text-center w-[95%] max-w-4xl max-h-[85vh] mb-10 flex flex-col">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-3xl font-black text-gray-800">Pilih Mode</h2>
       <button onclick="showScreen('welcome-screen')" class="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition">
@@ -125,7 +135,6 @@
     </div>
     
     <div class="menu-scroll grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 overflow-y-auto pr-2 pb-4 flex-1">
-      <!-- Generated via JS for cleaner HTML, but written explicitly for clarity here -->
       <!-- Dasar -->
       <button onclick="startGame('tambah')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all">
         <span class="text-3xl mb-1 group-hover:scale-110 transition">➕</span><span class="text-sm font-bold text-gray-700">Tambah</span>
@@ -196,9 +205,9 @@
     </div>
   </div>
 
-  <div id="game-screen" class="hidden w-full h-full flex flex-col z-10">
+  <div id="game-screen" class="hidden w-full h-full flex flex-col z-10 pb-12">
     
-    <!-- Header Area (Floating Exit Button) -->
+    <!-- Floating Exit Button -->
     <div class="absolute top-4 right-4 z-50">
       <button onclick="confirmExit()" class="bg-white/80 hover:bg-red-500 hover:text-white text-red-500 backdrop-blur-md rounded-full p-3 shadow-lg transition-all border-2 border-red-200 flex items-center justify-center gap-2 group">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
@@ -209,6 +218,7 @@
     <!-- Main Game Area -->
     <div class="flex-1 flex flex-col md:flex-row w-full max-w-7xl mx-auto p-4 md:p-6 gap-6 items-center justify-between">
       
+      <!-- Player 1 Panel (Blue) -->
       <div class="w-full md:w-80 bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border-4 border-blue-400 flex flex-col overflow-hidden relative">
         <div class="bg-blue-500 text-white text-center py-2 font-black tracking-widest uppercase">Tim Biru</div>
         <!-- Question -->
@@ -234,16 +244,20 @@
         </div>
       </div>
 
-      <div class="flex-1 w-full relative h-48 md:h-64 flex items-center justify-center mx-4 my-2 md:my-0 overflow-hidden rounded-3xl bg-white/30 backdrop-blur-sm border-2 border-white/50 shadow-inner">
+      <div class="flex-1 w-full relative h-48 md:h-64 flex items-center justify-center mx-4 my-2 md:my-0 overflow-hidden rounded-3xl bg-white/50 backdrop-blur-md border-2 border-white/80 shadow-inner">
         <!-- Ground/Grass Base -->
-        <div class="absolute bottom-0 w-full h-1/4 bg-gradient-to-t from-green-500 to-green-400 rounded-b-2xl"></div>
+        <div class="absolute bottom-0 w-full h-1/4 bg-gradient-to-t from-green-500 to-green-400 rounded-b-2xl border-t-4 border-green-600/30"></div>
         
         <!-- Center Warning Line -->
         <div class="absolute h-full w-2 bg-red-500/50 z-0"></div>
         <div class="absolute bottom-4 text-red-700 font-bold bg-white/80 px-3 py-1 rounded-full text-xs shadow">Batas Kalah</div>
 
+        <!-- Indicator Bubbles -->
+        <div class="absolute top-3 left-4 bg-blue-500 text-white font-bold px-4 py-1.5 rounded-full shadow border-2 border-white z-20">Skor: <span id="score-p1">0</span></div>
+        <div class="absolute top-3 right-4 bg-red-500 text-white font-bold px-4 py-1.5 rounded-full shadow border-2 border-white z-20">Skor: <span id="score-p2">0</span></div>
+
         <!-- The Rope Assembly -->
-        <div id="rope-assembly" class="relative flex items-center justify-center w-full max-w-lg transition-transform duration-500 ease-in-out z-10" style="transform: translateX(0px);">
+        <div id="rope-assembly" class="relative flex items-center justify-center w-full max-w-lg transition-transform duration-500 ease-out z-10" style="transform: translateX(0px);">
           
           <!-- The Rope Line -->
           <div class="absolute w-[150%] h-4 rope-pattern rounded-full shadow-md z-0"></div>
@@ -253,64 +267,73 @@
             <div class="w-full h-2 bg-red-500"></div>
           </div>
 
-          <!-- Cute SVG Characters Container -->
+          <!-- SD Characters Container -->
           <div class="w-full flex justify-between absolute px-10 md:px-16 items-center pointer-events-none">
             
-            <!-- Player 1 Character (Cute Blue Bear) -->
-            <div id="char-p1" class="w-24 h-24 md:w-32 md:h-32 origin-bottom transition-transform">
+            <!-- Player 1 Character (SD Boy - Blue Side, facing Right) -->
+            <div id="char-p1" class="w-24 h-24 md:w-32 md:h-32 origin-bottom transition-transform transform scale-x-100">
               <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xl">
-                <!-- Body -->
-                <circle cx="50" cy="60" r="35" fill="#3B82F6"/>
-                <!-- Ears -->
-                <circle cx="25" cy="30" r="12" fill="#2563EB"/>
-                <circle cx="75" cy="30" r="12" fill="#2563EB"/>
-                <circle cx="25" cy="30" r="6" fill="#93C5FD"/>
-                <circle cx="75" cy="30" r="6" fill="#93C5FD"/>
-                <!-- Face -->
-                <circle cx="35" cy="55" r="4" fill="#1E3A8A"/>
-                <circle cx="65" cy="55" r="4" fill="#1E3A8A"/>
-                <ellipse cx="50" cy="65" rx="10" ry="8" fill="#DBEAFE"/>
-                <path d="M 47 63 Q 50 67 53 63" stroke="#1E3A8A" stroke-width="2" fill="none"/>
-                <circle cx="50" cy="60" r="3" fill="#1E3A8A"/>
-                <!-- Arms Pulling (Rightwards) -->
-                <path d="M 60 70 L 90 60" stroke="#2563EB" stroke-width="8" stroke-linecap="round"/>
-                <path d="M 70 80 L 95 65" stroke="#2563EB" stroke-width="8" stroke-linecap="round"/>
+                <!-- Head -->
+                <circle cx="50" cy="35" r="16" fill="#fcd5ce"/>
+                <path d="M 34 35 C 34 10, 66 10, 66 35" fill="#212529"/> <!-- Hair -->
+                <circle cx="58" cy="33" r="2.5" fill="#000"/> <!-- Eye -->
+                <path d="M 55 40 Q 60 43 62 38" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"/> <!-- Smile -->
+                <!-- Hat (Red SD) -->
+                <path d="M 30 25 C 30 10, 70 10, 70 25 Z" fill="#e63946"/>
+                <path d="M 65 25 L 80 25 C 80 28, 65 28, 65 28 Z" fill="#e63946"/> <!-- visor -->
+                <!-- Body (White Shirt) -->
+                <path d="M 38 50 L 62 50 L 58 70 L 42 70 Z" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+                <rect x="41" y="68" width="18" height="4" fill="#343a40"/> <!-- Belt -->
+                <!-- Shorts (Red) -->
+                <path d="M 40 72 L 60 72 L 62 85 L 53 85 L 50 78 L 47 85 L 38 85 Z" fill="#e63946"/>
+                <!-- Arms (Pulling Right) -->
+                <path d="M 45 55 L 85 62" fill="none" stroke="#fcd5ce" stroke-width="7" stroke-linecap="round"/>
+                <path d="M 42 60 L 80 70" fill="none" stroke="#fcd5ce" stroke-width="7" stroke-linecap="round"/>
+                <circle cx="85" cy="62" r="4" fill="#fcd5ce"/>
+                <circle cx="80" cy="70" r="4" fill="#fcd5ce"/>
+                <!-- Legs & Shoes -->
+                <rect x="41" y="85" width="6" height="10" fill="#fcd5ce"/>
+                <rect x="53" y="85" width="6" height="10" fill="#fcd5ce"/>
+                <path d="M 39 95 C 39 90, 49 90, 49 95 L 49 98 L 39 98 Z" fill="#212529"/>
+                <path d="M 51 95 C 51 90, 61 90, 61 95 L 61 98 L 51 98 Z" fill="#212529"/>
               </svg>
             </div>
 
-            <!-- Player 2 Character (Cute Red Cat) -->
+            <!-- Player 2 Character (SD Girl - Red Side, drawn facing Right, flipped to face Left) -->
             <div id="char-p2" class="w-24 h-24 md:w-32 md:h-32 origin-bottom transition-transform transform scale-x-[-1]">
               <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xl">
-                <!-- Body -->
-                <circle cx="50" cy="60" r="32" fill="#EF4444"/>
-                <!-- Ears (Triangles) -->
-                <polygon points="15,20 40,40 20,50" fill="#DC2626"/>
-                <polygon points="85,20 60,40 80,50" fill="#DC2626"/>
-                <polygon points="20,25 35,40 25,45" fill="#FCA5A5"/>
-                <polygon points="80,25 65,40 75,45" fill="#FCA5A5"/>
-                <!-- Face -->
-                <circle cx="35" cy="55" r="4" fill="#7F1D1D"/>
-                <circle cx="65" cy="55" r="4" fill="#7F1D1D"/>
-                <path d="M 45 65 Q 50 70 55 65" stroke="#7F1D1D" stroke-width="2" fill="none"/>
-                <polygon points="48,60 52,60 50,63" fill="#7F1D1D"/>
-                <!-- Whiskers -->
-                <line x1="15" y1="55" x2="25" y2="58" stroke="#7F1D1D" stroke-width="1.5"/>
-                <line x1="15" y1="65" x2="25" y2="62" stroke="#7F1D1D" stroke-width="1.5"/>
-                <line x1="85" y1="55" x2="75" y2="58" stroke="#7F1D1D" stroke-width="1.5"/>
-                <line x1="85" y1="65" x2="75" y2="62" stroke="#7F1D1D" stroke-width="1.5"/>
-                <!-- Arms Pulling (Rightwards before flip) -->
-                <path d="M 60 70 L 90 60" stroke="#DC2626" stroke-width="8" stroke-linecap="round"/>
-                <path d="M 70 80 L 95 65" stroke="#DC2626" stroke-width="8" stroke-linecap="round"/>
+                <!-- Ponytail back -->
+                <path d="M 30 35 C 15 40, 20 60, 35 50" fill="#212529"/>
+                <!-- Head -->
+                <circle cx="50" cy="35" r="16" fill="#fcd5ce"/>
+                <path d="M 34 35 C 34 15, 66 15, 66 35" fill="#212529"/> <!-- Hair Base -->
+                <circle cx="58" cy="35" r="2.5" fill="#000"/> <!-- Eye -->
+                <path d="M 55 42 Q 60 45 62 40" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"/> <!-- Smile -->
+                <!-- Hair Tie -->
+                <circle cx="33" cy="35" r="4" fill="#e63946"/>
+                <!-- Body (White Shirt) -->
+                <path d="M 38 50 L 62 50 L 58 68 L 42 68 Z" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+                <rect x="41" y="66" width="18" height="4" fill="#343a40"/> <!-- Belt -->
+                <!-- Skirt (Red) -->
+                <path d="M 40 68 L 60 68 L 65 85 L 35 85 Z" fill="#e63946"/>
+                <!-- Arms (Pulling Right -> becomes Left when flipped) -->
+                <path d="M 45 55 L 85 62" fill="none" stroke="#fcd5ce" stroke-width="6" stroke-linecap="round"/>
+                <path d="M 42 60 L 80 70" fill="none" stroke="#fcd5ce" stroke-width="6" stroke-linecap="round"/>
+                <circle cx="85" cy="62" r="3.5" fill="#fcd5ce"/>
+                <circle cx="80" cy="70" r="3.5" fill="#fcd5ce"/>
+                <!-- Legs & Shoes -->
+                <rect x="42" y="85" width="5" height="10" fill="#fcd5ce"/>
+                <rect x="53" y="85" width="5" height="10" fill="#fcd5ce"/>
+                <path d="M 40 95 C 40 90, 48 90, 48 95 L 48 98 L 40 98 Z" fill="#212529"/>
+                <path d="M 51 95 C 51 90, 59 90, 59 95 L 59 98 L 51 98 Z" fill="#212529"/>
               </svg>
             </div>
 
           </div>
         </div>
-        <!-- Indicator Bubbles -->
-        <div class="absolute top-2 left-4 bg-blue-500 text-white font-bold px-3 py-1 rounded-full shadow border-2 border-white">Skor: <span id="score-p1">0</span></div>
-        <div class="absolute top-2 right-4 bg-red-500 text-white font-bold px-3 py-1 rounded-full shadow border-2 border-white">Skor: <span id="score-p2">0</span></div>
       </div>
 
+      <!-- Player 2 Panel (Red) -->
       <div class="w-full md:w-80 bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border-4 border-red-400 flex flex-col overflow-hidden relative">
         <div class="bg-red-500 text-white text-center py-2 font-black tracking-widest uppercase">Tim Merah</div>
         <!-- Question -->
@@ -344,22 +367,22 @@
     <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-md w-[90%] transform scale-100 transition-transform duration-300">
       <div id="winner-icon" class="text-7xl mb-4">🏆</div>
       <h2 id="winner-text" class="text-4xl font-black mb-2 text-gray-800">Tim Menang!</h2>
-      <p class="text-gray-500 mb-6">Pertandingan yang sangat sengit.</p>
+      <p class="text-gray-500 mb-6 font-semibold">Pertarungan yang sangat hebat!</p>
       <div class="flex gap-4 justify-center">
-        <button onclick="closeWinnerModal(); startGame(currentMode);" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition">Main Lagi</button>
-        <button onclick="closeWinnerModal(); showScreen('menu-screen');" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-xl transition">Ganti Mode</button>
+        <button onclick="closeWinnerModal(); startGame(currentMode);" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:scale-105 text-white font-bold py-3 rounded-xl transition shadow">Main Lagi</button>
+        <button onclick="closeWinnerModal(); showScreen('menu-screen');" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-xl transition shadow">Ganti Mode</button>
       </div>
     </div>
   </div>
 
   <!-- Exit Confirm Modal -->
   <div id="exit-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center backdrop-blur-sm">
-    <div class="bg-white p-6 rounded-3xl shadow-2xl text-center max-w-sm w-[90%]">
+    <div class="bg-white p-6 rounded-3xl shadow-2xl text-center max-w-sm w-[90%] border-t-8 border-red-500">
       <h3 class="text-2xl font-bold text-gray-800 mb-4">Keluar Permainan?</h3>
       <p class="text-gray-600 mb-6">Progres pertandingan saat ini akan hilang.</p>
       <div class="flex gap-4">
         <button onclick="hideExitModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-xl transition">Batal</button>
-        <button onclick="executeExit()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition">Ya, Keluar</button>
+        <button onclick="executeExit()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition shadow-md">Ya, Keluar</button>
       </div>
     </div>
   </div>
@@ -371,7 +394,7 @@
     let pointsP1 = 0;
     let pointsP2 = 0;
     const WIN_THRESHOLD = 5; 
-    let MOVE_STEP = 0; // Calculated based on screen size later
+    let MOVE_STEP = 0;
     let ansP1 = 0;
     let ansP2 = 0;
 
@@ -385,14 +408,14 @@
       document.getElementById('welcome-screen').classList.add('hidden');
       document.getElementById('menu-screen').classList.add('hidden');
       document.getElementById('game-screen').classList.add('hidden');
-      document.getElementById('clouds').classList.remove('hidden'); // Show clouds on menus
+      document.getElementById('clouds').classList.remove('hidden'); 
       
       document.getElementById(screenId).classList.remove('hidden');
       
       if (screenId === 'game-screen') {
         document.body.classList.add('in-game');
         document.getElementById('clouds').classList.add('hidden');
-        calculateMoveStep();
+        setTimeout(calculateMoveStep, 100); // Allow render before calc
         window.addEventListener('resize', calculateMoveStep);
       } else {
         document.body.classList.remove('in-game');
@@ -402,12 +425,12 @@
 
     // Responsive Rope Movement calculation
     function calculateMoveStep() {
-      // Calculate how many pixels the rope should move per point to reach the edge.
-      // Based on a container max-width or viewport.
-      const ropeContainerWidth = document.getElementById('rope-assembly').parentElement.clientWidth;
-      // We want WIN_THRESHOLD to pull the knot near the edge (say, 40% of container width)
+      const ropeContainer = document.getElementById('rope-assembly').parentElement;
+      if(!ropeContainer) return;
+      const ropeContainerWidth = ropeContainer.clientWidth;
+      // WIN_THRESHOLD pulls the knot near the edge (approx 40% of container width)
       MOVE_STEP = (ropeContainerWidth * 0.4) / WIN_THRESHOLD;
-      updateRopePosition(false); // Update without animation class just to snap
+      updateRopePosition(false); 
     }
 
     function requestFullScreen() {
@@ -450,7 +473,7 @@
       document.getElementById('in-p1').innerText = '';
       document.getElementById('in-p2').innerText = '';
       
-      requestFullScreen(); // Try to enter fullscreen
+      requestFullScreen(); 
       showScreen('game-screen');
       
       generateQuestion(1);
@@ -458,14 +481,9 @@
       updateRopePosition(false);
     }
 
-    function confirmExit() {
-      document.getElementById('exit-modal').classList.remove('hidden');
-    }
+    function confirmExit() { document.getElementById('exit-modal').classList.remove('hidden'); }
+    function hideExitModal() { document.getElementById('exit-modal').classList.add('hidden'); }
     
-    function hideExitModal() {
-      document.getElementById('exit-modal').classList.add('hidden');
-    }
-
     function executeExit() {
       hideExitModal();
       exitFullScreen();
@@ -525,138 +543,131 @@
           let a7 = randomInt(11, 25), b7 = randomInt(2, 9);
           qText = `${a7} × ${b7}`; answer = a7 * b7; break;
         case 'bagi2':
-          let b8 = randomInt(2, 9), ans8 = randomInt(11, 30);
+          let b8 = randomInt(11, 25), ans8 = randomInt(2, 9);
           qText = `${b8 * ans8} ÷ ${b8}`; answer = ans8; break;
         case 'persen':
-          let p = [10, 20, 25, 50, 75][randomInt(0, 4)];
-          let base = randomInt(1, 10) * 20; 
-          qText = `${p}% dari ${base}`; answer = (p * base) / 100; break;
+          let p = randomInt(1, 9) * 10; let val = randomInt(1, 10) * 100;
+          qText = `${p}% dari ${val}`; answer = (p/100) * val; break;
         case 'fpb':
-          let fpbAns = randomInt(2, 10), m1 = randomInt(1, 5), m2 = randomInt(1, 5);
-          while (m1 === m2 || gcd(m1, m2) !== 1) { m1 = randomInt(1, 5); m2 = randomInt(1, 5); }
-          qText = `FPB(${fpbAns*m1}, ${fpbAns*m2})`; answer = fpbAns; break;
+          let f1 = randomInt(2, 6) * randomInt(1,3), f2 = randomInt(2, 6) * randomInt(1,3);
+          qText = `FPB(${f1}, ${f2})`; answer = gcd(f1, f2); break;
         case 'kpk':
-          let k1 = randomInt(2, 8), k2 = randomInt(2, 8);
-          while (k1 === k2) k2 = randomInt(2, 8);
+          let k1 = randomInt(2, 6), k2 = randomInt(2, 6);
           qText = `KPK(${k1}, ${k2})`; answer = lcm(k1, k2); break;
         case 'waktu':
-          if (randomInt(0, 1) === 0) { let jam = randomInt(1, 5); qText = `${jam} Jam = ? Mnt`; answer = jam * 60; } 
-          else { let mnt = randomInt(1, 5); qText = `${mnt} Mnt = ? Dtk`; answer = mnt * 60; }
-          break;
+          let m = randomInt(1, 3);
+          qText = `${m} jam = ... mnt`; answer = m * 60; break;
         case 'jarak':
-          if (randomInt(0, 1) === 0) { let km = randomInt(1, 10); qText = `${km} km = ? m`; answer = km * 1000; } 
-          else { let m = randomInt(1, 15); qText = `${m} m = ? cm`; answer = m * 100; }
-          break;
+          let km = randomInt(1, 5);
+          qText = `${km} km = ... m`; answer = km * 1000; break;
         case 'buah':
-          let fruit = ['🍓', '🥝', '🍉', '🍎', '🍇'][randomInt(0, 4)];
-          let count = randomInt(1, 12);
-          qText = `<div class="flex flex-wrap justify-center text-4xl gap-1">`;
-          for(let i=0; i<count; i++) qText += `<span>${fruit}</span>`;
-          qText += `</div>`; answer = count; break;
+          let count = randomInt(1, 9);
+          const fruits = ['🍉', '🍎', '🍌', '🍓', '🍇', '🍊'];
+          let selectedFruit = fruits[randomInt(0, fruits.length - 1)];
+          qText = Array(count).fill(selectedFruit).join(' '); 
+          answer = count; 
+          break;
+        default:
+          qText = "1 + 1"; answer = 2;
       }
 
-      if (player === 1) {
-        document.getElementById('q-p1').innerHTML = qText;
-        ansP1 = answer;
-      } else {
-        document.getElementById('q-p2').innerHTML = qText;
-        ansP2 = answer;
+      if(player === 1) { 
+        document.getElementById('q-p1').innerText = qText; 
+        ansP1 = answer; 
+        document.getElementById('in-p1').innerText = ''; 
+      } else { 
+        document.getElementById('q-p2').innerText = qText; 
+        ansP2 = answer; 
+        document.getElementById('in-p2').innerText = ''; 
       }
     }
 
     function pressKey(player, key) {
-      let inputEl = document.getElementById(player === 1 ? 'in-p1' : 'in-p2');
-      let currentVal = inputEl.innerText;
-
-      if (key === 'C') {
-        inputEl.innerText = '';
-      } else if (key === 'Go') {
-        checkAnswer(player, parseInt(currentVal));
-      } else {
-        if(currentVal.length < 5) inputEl.innerText = currentVal + key;
-      }
-    }
-
-    function checkAnswer(player, inputAnswer) {
-      if (isNaN(inputAnswer)) return;
-
-      let isCorrect = (player === 1) ? (inputAnswer === ansP1) : (inputAnswer === ansP2);
-      let inputEl = document.getElementById(player === 1 ? 'in-p1' : 'in-p2');
-
-      if (isCorrect) {
-        // Success
-        tugPosition += (player === 1) ? -1 : 1;
-        if(player === 1) pointsP1++; else pointsP2++;
-        
-        document.getElementById('score-p1').innerText = pointsP1;
-        document.getElementById('score-p2').innerText = pointsP2;
-
-        updateRopePosition(true);
-        animateCharacter(player);
-        
-        inputEl.innerText = ''; 
-        generateQuestion(player); 
-        checkWin();
-      } else {
-        // Wrong Answer (Shake effect)
-        inputEl.classList.add('anim-shake');
-        setTimeout(() => {
-          inputEl.classList.remove('anim-shake');
-          inputEl.innerText = '';
-        }, 300);
-      }
-    }
-
-    function animateCharacter(player) {
-      const charEl = document.getElementById(player === 1 ? 'char-p1' : 'char-p2');
-      const animClass = player === 1 ? 'anim-pull-l' : 'anim-pull-r';
+      let inEl = document.getElementById(`in-p${player}`);
+      let current = inEl.innerText;
       
-      charEl.classList.remove('anim-pull-l', 'anim-pull-r');
-      void charEl.offsetWidth; // Trigger reflow to restart animation
-      charEl.classList.add(animClass);
+      if (key === 'C') {
+        inEl.innerText = '';
+      } else if (key === 'Go') {
+        if(current !== '') checkAnswer(player, parseInt(current));
+      } else {
+        if (current.length < 5) inEl.innerText += key;
+      }
+    }
+
+    function checkAnswer(player, userAns) {
+      let correctAns = player === 1 ? ansP1 : ansP2;
+      let inEl = document.getElementById(`in-p${player}`);
+      let charEl = document.getElementById(`char-p${player}`);
+
+      if (userAns === correctAns) {
+         // Correct Answer Animation & Logic
+         inEl.classList.add('bg-green-200', 'text-green-800');
+         setTimeout(() => inEl.classList.remove('bg-green-200', 'text-green-800'), 300);
+
+         if (player === 1) {
+           // Player 1 (Left) pulls -> rope moves left (negative X)
+           tugPosition--; 
+           pointsP1++;
+           document.getElementById('score-p1').innerText = pointsP1;
+           
+           // Animate SD Boy pulling
+           charEl.classList.add('anim-p1-pull');
+           setTimeout(() => charEl.classList.remove('anim-p1-pull'), 400);
+         } else {
+           // Player 2 (Right) pulls -> rope moves right (positive X)
+           tugPosition++; 
+           pointsP2++;
+           document.getElementById('score-p2').innerText = pointsP2;
+           
+           // Animate SD Girl pulling
+           charEl.classList.add('anim-p2-pull');
+           setTimeout(() => charEl.classList.remove('anim-p2-pull'), 400);
+         }
+         
+         updateRopePosition(true);
+         generateQuestion(player);
+         
+         // Slight delay before checking win to allow animation to play
+         setTimeout(checkWin, 500); 
+      } else {
+         // Wrong Answer Animation
+         inEl.classList.add('bg-red-200', 'anim-shake');
+         setTimeout(() => {
+           inEl.classList.remove('bg-red-200', 'anim-shake');
+           inEl.innerText = '';
+         }, 300);
+      }
     }
 
     function updateRopePosition(animate = true) {
-      let rope = document.getElementById('rope-assembly');
-      if (!animate) rope.style.transition = 'none';
-      else rope.style.transition = 'transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'; // Bouncy effect
-      
-      // tugPosition is negative when P1 (left) wins, positive when P2 (right) wins.
-      rope.style.transform = `translateX(${-tugPosition * MOVE_STEP}px)`;
+       let rope = document.getElementById('rope-assembly');
+       if (animate) rope.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+       else rope.style.transition = 'none';
+
+       // tugPosition: negative means pulled towards left (P1). positive means pulled towards right (P2)
+       let px = tugPosition * MOVE_STEP;
+       rope.style.transform = `translateX(${px}px)`;
     }
 
     function checkWin() {
-      if (tugPosition <= -WIN_THRESHOLD) {
-        showWinnerModal(1);
-      } else if (tugPosition >= WIN_THRESHOLD) {
-        showWinnerModal(2);
+      if (Math.abs(tugPosition) >= WIN_THRESHOLD) {
+         let p1Wins = tugPosition <= -WIN_THRESHOLD;
+         let winnerText = p1Wins ? "Tim Biru Menang!" : "Tim Merah Menang!";
+         let winnerColor = p1Wins ? "text-blue-600" : "text-red-600";
+         let winnerIcon = p1Wins ? "👦🏻🏆" : "👧🏻🏆";
+         
+         document.getElementById('winner-icon').innerText = winnerIcon;
+         document.getElementById('winner-text').innerText = winnerText;
+         document.getElementById('winner-text').className = `text-4xl font-black mb-2 ${winnerColor}`;
+         document.getElementById('winner-modal').classList.remove('hidden');
       }
-    }
-
-    function showWinnerModal(winnerNum) {
-      const modal = document.getElementById('winner-modal');
-      const text = document.getElementById('winner-text');
-      const icon = document.getElementById('winner-icon');
-      
-      if (winnerNum === 1) {
-        text.innerText = "Tim Biru Menang!";
-        text.className = "text-4xl font-black mb-2 text-blue-600";
-        icon.innerText = "🐻🏆";
-      } else {
-        text.innerText = "Tim Merah Menang!";
-        text.className = "text-4xl font-black mb-2 text-red-600";
-        icon.innerText = "🐱🏆";
-      }
-      
-      modal.classList.remove('hidden');
     }
 
     function closeWinnerModal() {
-      document.getElementById('winner-modal').classList.add('hidden');
+       document.getElementById('winner-modal').classList.add('hidden');
     }
 
-    // Initialize display
-    showScreen('welcome-screen');
   </script>
 </body>
 </html>
