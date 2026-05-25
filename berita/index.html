@@ -145,12 +145,60 @@
         }
 
         // Data berita
-        const initialNewsData = [
-          { id: 1, title: "Edaran Informasi Akademik", url: "https://github.com/YorianP22/CP22/blob/5a8c34d71f0b59046cd836c3cdc435ea40ffca11/Berita/SURAT%20PEMBERITAHUAN%20ASAS%202.pdf", date: "17 Mei 2026", time: "07:13", status: "Dipublikasikan", authorName: "Admin Korwil Sine", authorRole: "Penulis", authorAvatarUrl: "", thumbnailUrl: "https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true", description: "Surat Edaran kegiatan sekolah di Kecamatan Sine." },
-          { id: 3, title: "tess", url: "https://github.com/YorianP22/CP22/blob/5a8c34d71f0b59046cd836c3cdc435ea40ffca11/Berita/SURAT%20PEMBERITAHUAN%20ASAS%202.pdf", date: "17 Mei 2026", time: "07:13", status: "Dipublikasikan", authorName: "Admin Korwil Sine", authorRole: "Penulis", authorAvatarUrl: "", thumbnailUrl: "https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true", description: "Informasi tambahan." },
-          { id: 2, title: "Pelaksanaan Jadwal Kegiatan", url: "https://github.com/YorianP22/CP22/blob/5a8c34d71f0b59046cd836c3cdc435ea40ffca11/Berita/SURAT%20PEMBERITAHUAN%20ASAS%202.pdf", date: "16 Mei 2026", time: "09:30", status: "Dipublikasikan", authorName: "Admin Korwil Sine", authorRole: "YoriaN", authorAvatarUrl: "", thumbnailUrl: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=500&q=80", description: "Jadwal lengkap pelaksanaan kegiatan." }
-          { id: 4, title: "Pelaksanaan Jadwal Kegiatan", url: "https://github.com/YorianP22/CP22/blob/5a8c34d71f0b59046cd836c3cdc435ea40ffca11/Berita/Korwil%20Bidikbud%20Kecamatan%20Sine%20Gelar%20ASAS%202026.pdf", date: "22 Mei 2026", time: "09:30", status: "Dipublikasikan", authorName: "SDN Jagir 1", authorRole: "Hanum Ulfah Nur Baiti", authorAvatarUrl: "", thumbnailUrl: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=500&q=80", description: "Pelaksanaan ASAS KELAS 6 Semester 2 T.A 2025/2026." }
-        ];
+       const initialNewsData = [
+  { 
+    id: 1, 
+    title: "Edaran Informasi Akademik", 
+    url: "https://github.com/YorianP22/CP22/blob/5a8c34d71f0b59046cd836c3cdc435ea40ffca11/Berita/SURAT%20PEMBERITAHUAN%20ASAS%202.pdf", 
+    date: "17 Mei 2026", 
+    time: "07:13", 
+    status: "Dipublikasikan", 
+    authorName: "Admin Korwil Sine", 
+    authorRole: "Penulis", 
+    authorAvatarUrl: "", 
+    thumbnailUrl: "https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true", 
+    description: "Surat Edaran kegiatan sekolah di Kecamatan Sine." 
+  },
+  { 
+    id: 3, 
+    title: "tess", 
+    url: "https://github.com/YorianP22/CP22/blob/5a8c34d71f0b59046cd836c3cdc435ea40ffca11/Berita/SURAT%20PEMBERITAHUAN%20ASAS%202.pdf", 
+    date: "17 Mei 2026", 
+    time: "07:13", 
+    status: "Dipublikasikan", 
+    authorName: "Admin Korwil Sine", 
+    authorRole: "Penulis", 
+    authorAvatarUrl: "", 
+    thumbnailUrl: "https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true", 
+    description: "Informasi tambahan." 
+  },
+  { 
+    id: 2, 
+    title: "Pelaksanaan Jadwal Kegiatan", 
+    url: "https://github.com/YorianP22/CP22/blob/5a8c34d71f0b59046cd836c3cdc435ea40ffca11/Berita/SURAT%20PEMBERITAHUAN%20ASAS%202.pdf", 
+    date: "16 Mei 2026", 
+    time: "09:30", 
+    status: "Dipublikasikan", 
+    authorName: "Admin Korwil Sine", 
+    authorRole: "YoriaN", 
+    authorAvatarUrl: "", 
+    thumbnailUrl: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=500&q=80", 
+    description: "Jadwal lengkap pelaksanaan kegiatan." 
+  }, // <-- Koma di sini sebelumnya hilang
+  { 
+    id: 4, 
+    title: "Pelaksanaan Jadwal Kegiatan", 
+    url: "https://github.com/YorianP22/CP22/blob/5a8c34d71f0b59046cd836c3cdc435ea40ffca11/Berita/Korwil%20Bidikbud%20Kecamatan%20Sine%20Gelar%20ASAS%202026.pdf", 
+    date: "22 Mei 2026", 
+    time: "09:30", 
+    status: "Dipublikasikan", 
+    authorName: "SDN Jagir 1", 
+    authorRole: "Hanum Ulfah Nur Baiti", 
+    authorAvatarUrl: "", 
+    thumbnailUrl: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=500&q=80", 
+    description: "Pelaksanaan ASAS KELAS 6 Semester 2 T.A 2025/2026." 
+  }
+];
 
         let processedNewsData = [...initialNewsData].sort((a, b) => b.id - a.id);
         let searchQuery = "";
