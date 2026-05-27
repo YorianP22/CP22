@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unduh Sertifikat - KORWILDIKBUD KEC. SINE</title>
+    <!-- Tailwind, Font Awesome, Google Fonts (sama seperti kode asli) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .table-container::-webkit-scrollbar { height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col text-slate-800">
+    <!-- Header, main, footer (KONTENNYA SAMA PERSIS DENGAN KODE ASLI) -->
+    <!-- ... salin semua HTML dari <header> hingga </footer> dari kode asli Anda ... -->
+    <!-- TAPI ganti bagian <script> dengan yang di bawah ini -->
+
+    <!-- ==================== SCRIPT BARU ==================== -->
+    <script>
+        // GANTI DENGAN URL APPS SCRIPT ANDA YANG SUDAH DIPUBLIKASI
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycb.../exec'; 
+
+        let allData = [];
+        const ROWS_PER_PAGE = 10;
+        let currentPage = 1;
+
+        // Fungsi untuk mengambil data via JSONP
+        function fetchDataWithJSONP() {
+            const script = document.createElement('script');
+            const callbackName = 'handleData' + Date.now();
+            window[callbackName] = function(response) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                if (response.error) {
+                    showError({ message: response.error });
+                } else {
+                    initData(response);
+                }
+            };
+            const url = `${APPS_SCRIPT_URL}?callback=${callbackName}`;
+            script.src = url;
+            document.body.appendChild(script);
+            // timeout 10 detik
+            setTimeout(() => {
+                if (window[callbackName]) {
+                    delete window[callbackName];
+                    document.body.removeChild(script);
+                    showError({ message: 'Timeout: Server tidak merespon.' });
+                }
+            }, 10000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchDataWithJSONP();
+
+            const searchInput = document.getElementById('searchName');
+            const filterLembaga = document.getElementById('filterLembaga');
+            const filterKelas = document.getElementById('filterKelas');
+            const resetAndRender = () => { currentPage = 1; renderTable(); };
+            searchInput.addEventListener('input', resetAndRender);
+            filterLembaga.addEventListener('change', resetAndRender);
+            filterKelas.addEventListener('change', resetAndRender);
+        });
+
+        function initData(data) {
+            allData = data;
+            document.getElementById('loadingState').classList.add('hidden');
+
+            // Populate filter Lembaga & Kelas
+            const lembagas = [...new Set(data.map(item => item.lembaga))].filter(Boolean).sort();
+            const lembagaSelect = document.getElementById('filterLembaga');
+            lembagas.forEach(l => lembagaSelect.add(new Option(l, l)));
+
+            const kelases = [...new Set(data.map(item => item.kelas))].filter(Boolean).sort((a,b) => a-b);
+            const kelasSelect = document.getElementById('filterKelas');
+            kelases.forEach(k => kelasSelect.add(new Option(`Kelas ${k}`, k)));
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        function renderTable() {
+            const search = document.getElementById('searchName').value.toLowerCase();
+            const filterL = document.getElementById('filterLembaga').value;
+            const filterK = document.getElementById('filterKelas').value;
+
+            let filteredData = allData.filter(item => {
+                const matchName = item.nama.toLowerCase().includes(search);
+                const matchLembaga = filterL === "" || item.lembaga === filterL;
+                const matchKelas = filterK === "" || item.kelas.toString() === filterK;
+                return matchName && matchLembaga && matchKelas;
+            });
+
+            const tbody = document.getElementById('dataTable');
+            const emptyState = document.getElementById('emptyState');
+            const paginationWrapper = document.getElementById('paginationContainer');
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                emptyState.classList.remove('hidden');
+                emptyState.classList.add('flex');
+                paginationWrapper.classList.add('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+                emptyState.classList.remove('flex');
+            }
+
+            const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+            const startIdx = (currentPage - 1) * ROWS_PER_PAGE;
+            const paginatedData = filteredData.slice(startIdx, startIdx + ROWS_PER_PAGE);
+
+            paginatedData.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="px-6 py-4 text-center">${startIdx + idx + 1}</td>
+                    <td class="px-6 py-4 font-bold">${item.nama}</td>
+                    <td class="px-6 py-4 text-center"><span class="bg-slate-100 px-3 py-1 rounded-full text-xs">${item.kelas}</span></td>
+                    <td class="px-6 py-4">${item.lembaga}</td>
+                    <td class="px-6 py-4 text-center"><a href="${item.link}" target="_blank" class="inline-flex gap-2 bg-slate-900 hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg text-xs font-bold">Unduh</a></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            if (totalPages > 1) renderPaginationControls(totalPages, currentPage);
+            else paginationWrapper.classList.add('hidden');
+        }
+
+        function renderPaginationControls(totalPages, activePage) {
+            const navContainer = document.querySelector('#paginationContainer nav');
+            if (!navContainer) return;
+            navContainer.innerHTML = '';
+            const createButton = (label, page, isDisabled = false, isActive = false) => {
+                const btn = document.createElement('button');
+                btn.className = `min-w-[38px] h-10 px-3 rounded-lg text-sm font-medium transition-all
+                    ${isActive ? 'bg-blue-600 text-white shadow-md' : 
+                      isDisabled ? 'bg-white text-slate-300 border cursor-not-allowed opacity-50' : 
+                      'bg-white text-slate-700 border hover:bg-slate-50'}`;
+                btn.innerHTML = label;
+                if (!isDisabled && !isActive && typeof page === 'number') {
+                    btn.addEventListener('click', () => { currentPage = page; renderTable(); });
+                }
+                return btn;
+            };
+            // Tombol Previous, angka, Next (sama seperti kode asli)
+            // ... (salin fungsi renderPaginationControls dari kode asli)
+            // Untuk menghemat tempat, silakan gunakan kode pagination Anda yang sudah berfungsi dengan baik.
+            // Pastikan hanya mengganti cara mengambil data, sisanya sama persis.
+        }
+
+        function showError(error) {
+            const loadingDiv = document.getElementById('loadingState');
+            loadingDiv.innerHTML = `<i class="fas fa-exclamation-triangle text-3xl text-red-500"></i><p class="text-sm mt-2">${error.message}</p>`;
+            document.getElementById('paginationContainer')?.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
