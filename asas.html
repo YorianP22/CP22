@@ -100,19 +100,24 @@ async function apiPost(payload) {
 // ==================== KOMPONEN UTAMA ====================
 const { useState, useMemo, useEffect, useRef, useCallback } = React;
 
+// ==================== PERBAIKAN ICON ====================
+// Komponen Icon sederhana menggunakan data-lucide dan trigger createIcons global
 const Icon = ({ name, size = 18, className = "" }) => {
-  const iconRef = useRef(null);
+  const ref = useRef(null);
   useEffect(() => {
-    const tryCreateIcon = () => {
-      if (iconRef.current && window.lucide) {
-        try { window.lucide.createIcons({ icons: { [name]: iconRef.current } }); } catch(e) {}
-      }
-    };
-    tryCreateIcon();
-    const timeout = setTimeout(tryCreateIcon, 100);
-    return () => clearTimeout(timeout);
+    // Setelah mount, panggil createIcons pada elemen ini
+    if (ref.current && window.lucide) {
+      try {
+        window.lucide.createIcons({ icons: { [name]: ref.current } });
+      } catch(e) {}
+    }
   }, [name]);
-  return React.createElement('i', { ref: iconRef, 'data-lucide': name, style: { width: size, height: size, display: 'inline-block' }, className: className });
+  return React.createElement('i', { 
+    ref: ref, 
+    'data-lucide': name, 
+    style: { width: size, height: size, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' },
+    className: className 
+  });
 };
 
 const App = () => {
@@ -138,6 +143,20 @@ const App = () => {
   const autoRefreshInterval = useRef(null);
   const [selectedLinkOption, setSelectedLinkOption] = useState('periodeSaatIni');
 
+  // ========== GLOBAL LUCIDE REFRESH ==========
+  // Memanggil createIcons setiap kali komponen selesai render atau state berubah
+  useEffect(() => {
+    if (window.lucide && window.lucide.createIcons) {
+      // timeout untuk memastikan DOM sudah benar-benar siap
+      const timeout = setTimeout(() => {
+        try {
+          window.lucide.createIcons();
+        } catch(e) {}
+      }, 50);
+      return () => clearTimeout(timeout);
+    }
+  }, [view, newEntries.length, kartuStudents.length, liveScoreData.length, jadwalItems.length, selectedDate, showLiveScoreModal, showVideoModal, syncMessage.show]);
+
   const showToast = useCallback((text, type = 'success') => {
     setSyncMessage({ show: true, text, type });
     setTimeout(() => setSyncMessage({ show: false, text: '', type: '' }), 3000);
@@ -149,7 +168,7 @@ const App = () => {
         const namaList = ["AHMAD FAUZAN", "SITI NURHALIZA", "BUDI PRASETYO", "DEWI ANGGRAINI", "RANGGA SAPUTRA", "LINDA AULIA", "MICHAEL ALEX"];
         return namaList.map((nama, idx) => {
           const kelas = idx % 2 === 0 ? "6A" : "6B";
-          const scores = { pai: 75 + (idx*2)%20, bin: 80 + idx%15, mtk: 70 + idx%25, ipas: 78 + idx%12, pkn: 85 + idx%10, bjw: 70 + idx%5, pjk: 76 + idx%8, bing: 68 + idx%18, spdb: 65 + idx%22 };
+          const scores = { PABD: 75 + (idx*2)%20, bin: 80 + idx%15, mtk: 70 + idx%25, ipas: 78 + idx%12, pkn: 85 + idx%10, bjw: 70 + idx%5, pjk: 76 + idx%8, bing: 68 + idx%18, spdb: 65 + idx%22 };
           const total = Object.values(scores).reduce((a,b) => a+b, 0);
           return { kode: `P-00${idx+1}`, nama, kelas, scores, total, rataRata: total / 9 };
         }).sort((a,b) => b.rataRata - a.rataRata);
@@ -674,14 +693,14 @@ const App = () => {
   );
 
   const RankingView = () => {
-    const [selectedSubject, setSelectedSubject] = useState('pai');
+    const [selectedSubject, setSelectedSubject] = useState('PABD');
     const [refreshing, setRefreshing] = useState(false);
     const handleRefresh = () => {
       setRefreshing(true);
       refreshLiveScore();
       setTimeout(() => setRefreshing(false), 500);
     };
-    const subjectList = [{ key: 'pai', label: 'PAI' },{ key: 'bin', label: 'BIN' },{ key: 'mtk', label: 'MTK' },{ key: 'ipas', label: 'IPAS' },{ key: 'pkn', label: 'PKN' },{ key: 'bjw', label: 'BJAWA' },{ key: 'pjk', label: 'PJOK' },{ key: 'bing', label: 'BING' },{ key: 'spdb', label: 'SBDP' }];
+    const subjectList = [{ key: 'PABD', label: 'PABD' },{ key: 'bin', label: 'BIN' },{ key: 'mtk', label: 'MTK' },{ key: 'ipas', label: 'IPAS' },{ key: 'pkn', label: 'PKN' },{ key: 'bjw', label: 'BJAWA' },{ key: 'pjk', label: 'PJOK' },{ key: 'bing', label: 'BING' },{ key: 'spdb', label: 'SBDP' }];
     const classRankingBySubject = useMemo(() => {
       if (!liveScoreData.length) return [];
       const classMap = new Map();
@@ -702,7 +721,7 @@ const App = () => {
       const classOverallMap = new Map();
       liveScoreData.forEach(student => {
         const scores = student.scores || {};
-        const totalAllSubjects = (scores.pai||0)+(scores.bin||0)+(scores.mtk||0)+(scores.ipas||0)+(scores.pkn||0)+(scores.bjw||0)+(scores.pjk||0)+(scores.bing||0)+(scores.spdb||0);
+        const totalAllSubjects = (scores.PABD||0)+(scores.bin||0)+(scores.mtk||0)+(scores.ipas||0)+(scores.pkn||0)+(scores.bjw||0)+(scores.pjk||0)+(scores.bing||0)+(scores.spdb||0);
         const rataPerSiswa = totalAllSubjects / 9;
         const kelas = student.kelas || "Tidak Diketahui";
         if (!classOverallMap.has(kelas)) classOverallMap.set(kelas, { totalRataSiswa: 0, count: 0 });
@@ -752,11 +771,11 @@ const App = () => {
                 <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-slate-100 text-slate-700 text-xs font-bold uppercase"><tr><th className="px-4 py-3 text-center">Peringkat</th><th className="px-4 py-3 text-left">Lembaga</th><th className="px-4 py-3 text-center">Jml Siswa</th><th className="px-4 py-3 text-center bg-blue-50">Rata-rata {subjectList.find(s=>s.key===selectedSubject)?.label}</th></tr></thead><tbody className="divide-y divide-gray-100">{classRankingBySubject.map((item, idx) => (<tr key={item.kelas} className="hover:bg-slate-50 transition"><td className="px-4 py-3 text-center font-bold text-slate-600">{idx+1}</td><td className="px-4 py-3 font-bold text-slate-800 uppercase">{item.kelas}</td><td className="px-4 py-3 text-center">{item.jumlahSiswa} siswa</td><td className="px-4 py-3 text-center bg-blue-50/70 font-black text-indigo-700">{item.rataRata.toFixed(2)}</td></tr>))}</tbody></table></div>
               </div>
               <div className="border border-slate-100 rounded-xl bg-white shadow-sm overflow-hidden">
-                <div className="p-4 pb-2 border-b border-slate-200 bg-slate-50/50"><h3 className="font-bold text-slate-700 flex items-center gap-2"><Icon name="layers" size={18} className="text-emerald-600"/> Peringkat Lembaga Seluruh Mata Pelajaran</h3><p className="text-[10px] text-slate-500 mt-0.5">Rata-rata gabungan PAI, BIN, MTK, IPAS, PKN, BJAWA, PJOK, BING, SBDP</p></div>
+                <div className="p-4 pb-2 border-b border-slate-200 bg-slate-50/50"><h3 className="font-bold text-slate-700 flex items-center gap-2"><Icon name="layers" size={18} className="text-emerald-600"/> Peringkat Lembaga Seluruh Mata Pelajaran</h3><p className="text-[10px] text-slate-500 mt-0.5">Rata-rata gabungan PABD, BIN, MTK, IPAS, PKN, BJAWA, PJOK, BING, SBDP</p></div>
                 <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-slate-100 text-slate-700 text-xs font-bold uppercase"><tr><th className="px-4 py-3 text-center">Peringkat</th><th className="px-4 py-3 text-left">Lembaga</th><th className="px-4 py-3 text-center">Jml Siswa</th><th className="px-4 py-3 text-center bg-emerald-50">Rata-rata Semua Mapel</th></tr></thead><tbody className="divide-y divide-gray-100">{overallClassRanking.map((item, idx) => (<tr key={item.kelas} className={`hover:bg-slate-50 transition ${idx === 0 ? 'bg-yellow-50 font-extrabold' : ''}`}><td className="px-4 py-3 text-center font-bold text-slate-600">{idx+1}</td><td className="px-4 py-3 font-bold text-slate-800 uppercase">{item.kelas}</td><td className="px-4 py-3 text-center">{item.jumlahSiswa} siswa</td><td className="px-4 py-3 text-center bg-emerald-50/60 font-black text-emerald-800">{item.rataRataKelas.toFixed(2)}</td></tr>))}</tbody></table></div>
               </div>
             </div>
-            <div className="mt-2"><div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-200"><Icon name="trending-up" size={18} className="text-green-600" /><h3 className="font-bold text-slate-700">Rata-rata Mapel Keseluruhan (Seluruh Lembaga)</h3><span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-1 rounded-full ml-2">Diurutkan dari tertinggi</span></div><div className="overflow-x-auto rounded-xl border border-slate-100"><table className="w-full text-sm"><thead className="bg-slate-100 text-slate-700 text-xs font-bold uppercase"><tr><th className="px-5 py-3 text-center">Peringkat</th><th className="px-5 py-3 text-left">Mata Pelajaran</th><th className="px-5 py-3 text-center">Rata-rata Nilai</th><th className="px-5 py-3 text-left w-1/2">Grafik Sederhana</th></tr></thead><tbody className="divide-y divide-gray-100">{overallSubjectAverage.map((subj, idx) => { const percent = (subj.rataRata / 100) * 100; return (<tr key={subj.mapel} className="hover:bg-slate-50 transition"><td className="px-5 py-3 text-center font-bold">{idx+1}</td><td className="px-5 py-3 font-semibold text-slate-800">{subj.mapel}</td><td className="px-5 py-3 text-center font-black text-slate-700">{subj.rataRata.toFixed(2)}</td><td className="px-5 py-3"><div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden"><div className="bg-indigo-500 h-2.5 rounded-full" style={{ width: `${percent}%` }}></div></div><span className="text-[10px] text-slate-400 ml-1">{percent.toFixed(0)}%</span></td></tr>);})}</tbody></table></div><div className="mt-4 p-3 bg-indigo-50/40 rounded-xl text-xs text-indigo-800 border border-indigo-100"><p className="font-bold flex items-center gap-1"><Icon name="info" size={14} /> Rata-rata Lembaga:</p><p>Nilai di atas merupakan rata-rata seluruh siswa pada setiap mata pelajaran (PAI, BIN, MTK, IPAS, PKN, B.JAWA, PJOK, B.ING, SBDP). Diurutkan dari nilai rata-rata tertinggi ke terendah sebagai evaluasi capaian akademik lembaga secara umum.</p></div></div>
+            <div className="mt-2"><div className="flex items-center gap-2 mb-4 pb-2 border-b border-slate-200"><Icon name="trending-up" size={18} className="text-green-600" /><h3 className="font-bold text-slate-700">Rata-rata Mapel Keseluruhan (Seluruh Lembaga)</h3><span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-1 rounded-full ml-2">Diurutkan dari tertinggi</span></div><div className="overflow-x-auto rounded-xl border border-slate-100"><table className="w-full text-sm"><thead className="bg-slate-100 text-slate-700 text-xs font-bold uppercase"><tr><th className="px-5 py-3 text-center">Peringkat</th><th className="px-5 py-3 text-left">Mata Pelajaran</th><th className="px-5 py-3 text-center">Rata-rata Nilai</th><th className="px-5 py-3 text-left w-1/2">Grafik Sederhana</th></tr></thead><tbody className="divide-y divide-gray-100">{overallSubjectAverage.map((subj, idx) => { const percent = (subj.rataRata / 100) * 100; return (<tr key={subj.mapel} className="hover:bg-slate-50 transition"><td className="px-5 py-3 text-center font-bold">{idx+1}</td><td className="px-5 py-3 font-semibold text-slate-800">{subj.mapel}</td><td className="px-5 py-3 text-center font-black text-slate-700">{subj.rataRata.toFixed(2)}</td><td className="px-5 py-3"><div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden"><div className="bg-indigo-500 h-2.5 rounded-full" style={{ width: `${percent}%` }}></div></div><span className="text-[10px] text-slate-400 ml-1">{percent.toFixed(0)}%</span></td></tr>);})}</tbody></table></div><div className="mt-4 p-3 bg-indigo-50/40 rounded-xl text-xs text-indigo-800 border border-indigo-100"><p className="font-bold flex items-center gap-1"><Icon name="info" size={14} /> Rata-rata Lembaga:</p><p>Nilai di atas merupakan rata-rata seluruh siswa pada setiap mata pelajaran (PABD, BIN, MTK, IPAS, PKN, B.JAWA, PJOK, B.ING, SBDP). Diurutkan dari nilai rata-rata tertinggi ke terendah sebagai evaluasi caPABDan akademik lembaga secara umum.</p></div></div>
           </div>
         </div>
       </div>
@@ -809,7 +828,7 @@ const App = () => {
       <div className="fixed inset-0 z-[600] flex items-center justify-center p-2 modal-backdrop" style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(10px)' }}>
         <div className="bg-white rounded-2xl shadow-2xl w-[98vw] max-w-[1600px] h-[94vh] flex flex-col overflow-hidden animate-fadeIn">
           <div className="bg-gradient-to-r from-blue-800 to-blue-600 text-white flex-shrink-0"><div className="px-5 py-3 flex justify-between items-center border-b border-blue-500"><div className="flex items-center gap-3"><Icon name="activity" size={24} /><h2 className="font-bold text-lg tracking-tight">NILAI UJIAN REALTIME</h2></div><button onClick={() => setShowLiveScoreModal(false)} className="p-2 rounded-full hover:bg-white/20 transition"><Icon name="x" size={24} /></button></div><div className="marquee-container bg-red-600 text-white text-sm py-1.5"><div className="marquee-content"><i className="fas fa-graduation-cap mr-2"></i> INFORMASI PENTING: Perolehan nilai diurutkan secara realtime berdasarkan Rata-rata tertinggi. Junjung tinggi kejujuran, tetap tenang, dan berikan yang terbaik. Prestasi hari ini adalah langkah awal menuju masa depan yang gemilang! Semangat!</div></div></div>
-          <div className="flex-1 overflow-auto p-4 bg-gray-50"><div className="bg-white rounded-xl shadow-md border border-gray-200 h-full flex flex-col"><div className="p-3 border-b border-gray-200 flex justify-between items-center bg-gray-50 rounded-t-xl flex-shrink-0"><h3 className="font-bold text-gray-800 flex items-center gap-2"><Icon name="award" size={20} className="text-yellow-500" /> Peringkat Prestasi</h3><div className="flex items-center gap-3"><div className="flex items-center gap-2"><span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span><span className="text-xs font-semibold text-green-600">LIVE</span></div><div className="text-sm text-gray-500 font-mono">{currentTime}</div><button onClick={() => refreshLiveScore()} className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full"><Icon name="refresh-cw" size={14} /> Refresh</button></div></div><div className="table-container overflow-auto flex-1">{loadingLiveScore && liveScoreData.length === 0 ? (<div className="flex justify-center items-center h-64"><div className="spinner border-slate-800 w-8 h-8"></div><span className="ml-3">Memuat data nilai...</span></div>) : liveScoreData.length === 0 ? (<div className="text-center py-32 text-slate-400"><Icon name="database" size={48} className="mx-auto mb-3" />Belum ada data nilai</div>) : (<table className="w-full text-sm text-left whitespace-nowrap"><thead className="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0 z-10 shadow-sm"><tr><th className="px-4 py-3 text-center w-16">Rank</th><th className="px-4 py-3">No. Peserta</th><th className="px-4 py-3">Nama Peserta</th><th className="px-4 py-3 text-center">Kelas</th><th className="px-3 py-3 text-center">PAI</th><th className="px-3 py-3 text-center">BIN</th><th className="px-3 py-3 text-center">MTK</th><th className="px-3 py-3 text-center">IPAS</th><th className="px-3 py-3 text-center">PKN</th><th className="px-3 py-3 text-center">B.JAWA</th><th className="px-3 py-3 text-center">PJOK</th><th className="px-3 py-3 text-center">B.ING</th><th className="px-3 py-3 text-center bg-purple-50">SBDP</th><th className="px-4 py-3 text-center bg-blue-50 font-bold">TOTAL</th><th className="px-4 py-3 text-center bg-blue-100 font-bold text-blue-800">RATA-RATA</th></tr></thead><tbody className="divide-y divide-gray-200 bg-white">{liveScoreData.map((student, idx) => { const rank = idx+1; let rowClass = "bg-white hover:bg-gray-50 transition"; let rankDisplay = <span className="font-bold text-gray-700">{rank}</span>; if (rank===1) { rowClass += " rank-1"; rankDisplay = <Icon name="crown" size={18} className="text-yellow-500" />; } else if (rank===2) { rowClass += " rank-2"; rankDisplay = <Icon name="medal" size={18} className="text-gray-400" />; } else if (rank===3) { rowClass += " rank-3"; rankDisplay = <Icon name="award" size={18} className="text-orange-400" />; } return (<tr key={student.kode} className={rowClass}><td className="px-4 py-3 text-center">{rankDisplay}</td><td className="px-4 py-3 font-semibold text-gray-800">{student.kode}</td><td className="px-4 py-3 font-bold text-gray-900">{student.nama}</td><td className="px-4 py-3 text-center text-gray-600">{student.kelas}</td><td className="px-3 py-3 text-center">{student.scores?.pai ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.bin ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.mtk ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.ipas ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.pkn ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.bjw ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.pjk ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.bing ?? 0}</td><td className="px-3 py-3 text-center bg-purple-50/50">{student.scores?.spdb ?? 0}</td><td className="px-4 py-3 text-center bg-blue-50/50 font-bold text-gray-800">{student.total}</td><td className="px-4 py-3 text-center bg-blue-100/50 font-black text-blue-700 text-lg">{student.rataRata.toFixed(2)}</td></tr>);})}</tbody></table>)}</div></div></div>
+          <div className="flex-1 overflow-auto p-4 bg-gray-50"><div className="bg-white rounded-xl shadow-md border border-gray-200 h-full flex flex-col"><div className="p-3 border-b border-gray-200 flex justify-between items-center bg-gray-50 rounded-t-xl flex-shrink-0"><h3 className="font-bold text-gray-800 flex items-center gap-2"><Icon name="award" size={20} className="text-yellow-500" /> Peringkat Prestasi</h3><div className="flex items-center gap-3"><div className="flex items-center gap-2"><span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span><span className="text-xs font-semibold text-green-600">LIVE</span></div><div className="text-sm text-gray-500 font-mono">{currentTime}</div><button onClick={() => refreshLiveScore()} className="text-blue-600 hover:text-blue-800 text-sm flex items-center gap-1 bg-blue-50 px-3 py-1 rounded-full"><Icon name="refresh-cw" size={14} /> Refresh</button></div></div><div className="table-container overflow-auto flex-1">{loadingLiveScore && liveScoreData.length === 0 ? (<div className="flex justify-center items-center h-64"><div className="spinner border-slate-800 w-8 h-8"></div><span className="ml-3">Memuat data nilai...</span></div>) : liveScoreData.length === 0 ? (<div className="text-center py-32 text-slate-400"><Icon name="database" size={48} className="mx-auto mb-3" />Belum ada data nilai</div>) : (<table className="w-full text-sm text-left whitespace-nowrap"><thead className="text-xs text-gray-700 uppercase bg-gray-100 sticky top-0 z-10 shadow-sm"><tr><th className="px-4 py-3 text-center w-16">Rank</th><th className="px-4 py-3">No. Peserta</th><th className="px-4 py-3">Nama Peserta</th><th className="px-4 py-3 text-center">Kelas</th><th className="px-3 py-3 text-center">PABD</th><th className="px-3 py-3 text-center">BIN</th><th className="px-3 py-3 text-center">MTK</th><th className="px-3 py-3 text-center">IPAS</th><th className="px-3 py-3 text-center">PKN</th><th className="px-3 py-3 text-center">B.JAWA</th><th className="px-3 py-3 text-center">PJOK</th><th className="px-3 py-3 text-center">B.ING</th><th className="px-3 py-3 text-center bg-purple-50">SBDP</th><th className="px-4 py-3 text-center bg-blue-50 font-bold">TOTAL</th><th className="px-4 py-3 text-center bg-blue-100 font-bold text-blue-800">RATA-RATA</th></tr></thead><tbody className="divide-y divide-gray-200 bg-white">{liveScoreData.map((student, idx) => { const rank = idx+1; let rowClass = "bg-white hover:bg-gray-50 transition"; let rankDisplay = <span className="font-bold text-gray-700">{rank}</span>; if (rank===1) { rowClass += " rank-1"; rankDisplay = <Icon name="crown" size={18} className="text-yellow-500" />; } else if (rank===2) { rowClass += " rank-2"; rankDisplay = <Icon name="medal" size={18} className="text-gray-400" />; } else if (rank===3) { rowClass += " rank-3"; rankDisplay = <Icon name="award" size={18} className="text-orange-400" />; } return (<tr key={student.kode} className={rowClass}><td className="px-4 py-3 text-center">{rankDisplay}</td><td className="px-4 py-3 font-semibold text-gray-800">{student.kode}</td><td className="px-4 py-3 font-bold text-gray-900">{student.nama}</td><td className="px-4 py-3 text-center text-gray-600">{student.kelas}</td><td className="px-3 py-3 text-center">{student.scores?.PABD ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.bin ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.mtk ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.ipas ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.pkn ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.bjw ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.pjk ?? 0}</td><td className="px-3 py-3 text-center">{student.scores?.bing ?? 0}</td><td className="px-3 py-3 text-center bg-purple-50/50">{student.scores?.spdb ?? 0}</td><td className="px-4 py-3 text-center bg-blue-50/50 font-bold text-gray-800">{student.total}</td><td className="px-4 py-3 text-center bg-blue-100/50 font-black text-blue-700 text-lg">{student.rataRata.toFixed(2)}</td></tr>);})}</tbody>}</table>)}</div></div></div>
           <div className="p-2 bg-slate-100 text-center text-[10px] text-slate-400 flex-shrink-0 border-t"><span>📊 Data diambil dari server secara realtime | Refresh otomatis setiap 30 detik | </span></div>
         </div>
       </div>
