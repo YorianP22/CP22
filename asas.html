@@ -47,11 +47,10 @@
 <body class="bg-[#f8fafc] w-full">
 <div id="root" class="w-full min-h-screen flex flex-col"></div>
 <script type="text/babel">
-// ==================== KONFIGURASI ====================
-// ⚠️ GANTI URL INI DENGAN DEPLOYMENT WEB APP APPS SCRIPT ANDA ⚠️
+
 const API_BASE = "https://script.google.com/macros/s/AKfycbx9dIBo8LWYGGI1hmlaIvuEUegfXKpW9nNHcMaaiS5BEGhTT0jFOUQ94tnu-xfmuhfNHQ/exec";
 
-// ==================== JSONP & FETCH HELPER ====================
+
 function jsonpRequest(params, timeout = 15000) {
   return new Promise((resolve, reject) => {
     const callbackName = `jsonp_${Date.now()}_${Math.random().toString(36).substr(2, 8)}`;
@@ -99,11 +98,10 @@ async function apiPost(payload) {
   return data;
 }
 
-// ==================== KOMPONEN UTAMA ====================
+
 const { useState, useMemo, useEffect, useRef, useCallback } = React;
 
-// ==================== PERBAIKAN ICON ====================
-// Komponen Icon sederhana menggunakan data-lucide dan trigger createIcons global
+
 const Icon = ({ name, size = 18, className = "" }) => {
   const ref = useRef(null);
   useEffect(() => {
@@ -145,8 +143,7 @@ const App = () => {
   const autoRefreshInterval = useRef(null);
   const [selectedLinkOption, setSelectedLinkOption] = useState('periodeSaatIni');
 
-  // ========== GLOBAL LUCIDE REFRESH ==========
-  // Memanggil createIcons setiap kali komponen selesai render atau state berubah
+
   useEffect(() => {
     if (window.lucide && window.lucide.createIcons) {
       // timeout untuk memastikan DOM sudah benar-benar siap
@@ -191,11 +188,11 @@ const App = () => {
     }
   }, [isDemoMode, showToast]);
 
-  // Load semua data awal
+ 
   useEffect(() => {
     const init = async () => {
       setIsClient(true);
-      // Coba deteksi mode demo / koneksi
+     
       try {
         const students = await apiGet('getStudents');
         setIsDemoMode(false);
@@ -211,7 +208,7 @@ const App = () => {
       } catch (err) {
         console.warn('Mode demo aktif:', err);
         setIsDemoMode(true);
-        // Data dummy
+
         setDbStudents([
           { nisn: '1234567890', nama: 'AHMAD FAUZAN', kelas: '6', rombel: 'SDN SINE 1 SINE' },
           { nisn: '1234567891', nama: 'SITI NURHALIZA', kelas: '6', rombel: 'SDN SINE 1 SINE' },
@@ -347,8 +344,7 @@ const App = () => {
     }
   };
 
-  // ==================== KOMPONEN TAMPILAN ====================
-
+ 
   const HomeView = () => {
     const [currentDateTime, setCurrentDateTime] = useState('');
     useEffect(() => {
