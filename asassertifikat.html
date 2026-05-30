@@ -19,7 +19,7 @@
 
     <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
         <div class="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <a href="https://www.korwilsine.web.id" class="flex items-center gap-3 group">
+            <a href="https://www.korwilsine.web.id/asas" class="flex items-center gap-3 group">
 
                 <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Lambang_Kabupaten_Ngawi_%28svg%29.svg/1280px-Lambang_Kabupaten_Ngawi_%28svg%29.svg.png" 
                      alt="Logo Ngawi" class="h-9 w-auto group-hover:scale-105 transition-transform">
@@ -95,15 +95,14 @@
     </footer>
 
     <script>
-        // ========== KONFIGURASI ==========
-        // GANTI DENGAN URL DEPLOYMENT WEB APP ANDA!
+       
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQTFarlG-i441pLW8eZ4p2u4y2T_q-jgwQgHZ9K3CO_7xUP98Rb3Bl6c6RB1qofjid/exec'; 
 
         let allData = [];
         const ROWS_PER_PAGE = 10;
         let currentPage = 1;
 
-        // ========== AMBIL DATA DENGAN JSONP ==========
+     
         function fetchData() {
             const loadingDiv = document.getElementById('loadingState');
             loadingDiv.classList.remove('hidden');
@@ -139,12 +138,12 @@
             }, 15000);
         }
 
-        // ========== INISIALISASI DATA ==========
+        
         function initData(data) {
             allData = data;
             document.getElementById('loadingState').classList.add('hidden');
             
-            // Filter Lembaga
+          
             const lembagaSet = new Set();
             const kelasSet = new Set();
             data.forEach(item => {
@@ -168,7 +167,7 @@
             document.getElementById('filterKelas').addEventListener('change', () => { currentPage = 1; renderTable(); });
         }
 
-        // ========== RENDER TABEL DENGAN PAGINATION ==========
+       
         function renderTable() {
             const search = document.getElementById('searchName').value.toLowerCase();
             const filterL = document.getElementById('filterLembaga').value;
@@ -226,7 +225,7 @@
             }
         }
         
-        // ========== FUNGSI PAGINATION LENGKAP ==========
+    
         function renderPagination(totalPages, activePage) {
             const nav = document.querySelector('#paginationContainer nav');
             nav.innerHTML = '';
@@ -244,7 +243,7 @@
                 return btn;
             };
             
-            // Previous
+           
             const prevDisabled = activePage === 1;
             nav.appendChild(createButton('<i class="fas fa-chevron-left text-xs"></i><span class="hidden sm:inline ml-1">Prev</span>', activePage - 1, prevDisabled));
             
@@ -292,7 +291,7 @@
             document.getElementById('paginationContainer').classList.add('hidden');
         }
         
-        // Mulai aplikasi
+        
         fetchData();
     </script>
 </body>
