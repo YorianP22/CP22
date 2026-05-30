@@ -859,9 +859,25 @@ const App = () => {
               { id: 'unduhan', label: 'Unduhan', icon: 'download' },
               { id: 'kartu', label: 'Cetak Kartu', icon: 'id-card' },
               { id: 'sertifikat', label: 'Sertifikat', icon: 'award', externalLink: 'https://www.korwilsine.web.id/asassertifikat' }
-            ].map((item) => (
-              <button key={item.id} onClick={() => { if (item.externalLink) window.open(item.externalLink, '_blank'); else if (item.id === 'liveScore') setShowLiveScoreModal(true); else setView(item.id); }} className={`px-4 py-2 rounded-xl text-[10px] sm:text-xs font-bold flex items-center gap-1.5 uppercase tracking-wider transition-all ${view === item.id && !item.externalLink ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}><Icon name={item.icon} size={14} />{item.label}</button>
-            ))}
+].map((item) => (
+  <button 
+    key={item.id} 
+    onClick={() => { 
+      if (item.externalLink) {
+        // Menggunakan '_self' agar terbuka di tab yang sama
+        window.open(item.externalLink, '_self'); 
+      } else if (item.id === 'liveScore') {
+        setShowLiveScoreModal(true); 
+      } else {
+        setView(item.id);
+      }
+    }} 
+    className={`px-4 py-2 rounded-xl text-[10px] sm:text-xs font-bold flex items-center gap-1.5 uppercase tracking-wider transition-all ${view === item.id && !item.externalLink ? 'bg-white text-slate-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+  >
+    <Icon name={item.icon} size={14} />
+    {item.label}
+  </button>
+))
           </div>
           <div className="flex items-center gap-2 bg-white/80 rounded-xl px-3 py-1.5 shadow-sm border border-slate-200 ml-auto md:ml-0"><span className="text-[10px] font-bold text-slate-500 uppercase">Pilih Periode</span><select value={selectedLinkOption} onChange={handlePeriodChange} className="text-xs font-medium bg-transparent border-none focus:ring-0 p-1"><option value="periodeSaatIni">Pilih Opsi</option><option value="periodeS1Kelas5">Periode Saat Ini</option><option value="periodeS2">S2 Kelas 6 T.A 2025/2026</option></select></div>
         </div>
