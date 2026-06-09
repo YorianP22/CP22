@@ -3,109 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KORWIL SINE</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-                    },
-                    colors: {
-                        'primary-dark': '#2A3645',
-                        'bg-light': '#F4F7F6',
-                    }
-                }
-            }
-        }
-    </script>
+    <title>MONITORING PRESENSI K-SINE</title>
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
+        body, html {
             margin: 0;
             padding: 0;
-            background-color: #F4F7F6;
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* Menghilangkan scrollbar ganda */
         }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
-<body class="antialiased min-h-screen bg-slate-100 flex items-center justify-center p-4">
+<body>
 
-    <!-- ASAS Popup Modal (Now acts as the main content) -->
-    <div id="asas-modal" class="w-full max-w-md transform transition-all">
-        <div class="bg-white rounded-3xl shadow-2xl w-full p-6 relative">
-            <!-- Close Button - Redirects to main web -->
-            <button onclick="redirectToMain()" class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-700 transition-colors">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            
-            <div class="text-center mt-4 mb-6">
-                <!-- Added Logo back here -->
-                <img src="https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true" alt="Logo Korwil Sine" class="h-16 w-auto mx-auto mb-4 drop-shadow-sm">
-                
-                <h2 class="text-2xl font-bold text-slate-800">Ujian Berbasis Komputer (CBT) Korwil Sine</h2>
-                <p class="text-slate-500 text-sm mt-2">Silakan pilih Untuk Mengakses.</p>
-            </div>
+    <iframe 
+        src="https://script.google.com/macros/s/AKfycbyG-dQo_Q0JzqfkpRkx2BojngkmwTr2mYEGvBxWj6bTAa03dvD74sWzGtp5l6TIsWAq/exec" 
+        allow="geolocation; microphone; camera; clipboard-read; clipboard-write"
+        allowfullscreen>
+    </iframe>
 
-            <div class="flex flex-col gap-3">
-                <!-- Link ASAS Kelas 5 -->
-                <a href="https://korwilsine.web.id/asaskls5-2026" class="group flex items-center justify-between w-full p-4 rounded-2xl border-2 border-slate-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all duration-300">
-                    <div class="flex flex-col text-left">
-                        <span class="font-bold text-slate-800 group-hover:text-emerald-700 transition-colors">ASAS Kelas 5 Semester 2</span>
-                        <span class="text-xs text-slate-500 mt-1">T.A 2025/2026</span>
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-                        <i class="fa-solid fa-chevron-right text-sm"></i>
-                    </div>
-                </a>
-
-                <!-- Link ASAS Kelas 6 -->
-                <a href="https://korwilsine.web.id/asaskls6-2026" class="group flex items-center justify-between w-full p-4 rounded-2xl border-2 border-slate-100 hover:border-blue-500 hover:bg-blue-50 transition-all duration-300">
-                    <div class="flex flex-col text-left">
-                        <span class="font-bold text-slate-800 group-hover:text-blue-700 transition-colors">ASAS Kelas 6 Semester 2</span>
-                        <span class="text-xs text-slate-500 mt-1">T.A 2025/2026</span>
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                        <i class="fa-solid fa-chevron-right text-sm"></i>
-                    </div>
-                </a>
-            </div>
-            
-            <div class="mt-6 pt-4 border-t border-slate-100 text-center">
-                <button onclick="redirectToMain()" class="text-sm font-semibold text-slate-500 hover:text-slate-800 transition-colors">Batal & Kembali</button>
-            </div>
-        </div>
-        
-        <div class="mt-8 text-center">
-            <p class="text-slate-500 text-sm font-medium">© 2026 KORWIL SINE</p>
-            <p class="text-slate-400 text-xs mt-1">Powered by YoriApp</p>
-        </div>
-    </div>
-
-    <script>
-        function redirectToMain() {
-            window.location.href = "https://script.google.com/macros/s/AKfycbyG-dQo_Q0JzqfkpRkx2BojngkmwTr2mYEGvBxWj6bTAa03dvD74sWzGtp5l6TIsWAq/exec";
-        }
-    </script>
 </body>
 </html>
