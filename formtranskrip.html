@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Dalam Persiapan - KORWIL SINE</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        govblue: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0066cc',
+                            600: '#0052a3',
+                            700: '#003d7a',
+                            800: '#002952',
+                            900: '#0a1d37',
+                        },
+                        accent: {
+                            teal: '#0df2c9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-govblue-900 text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-accent-teal selection:text-govblue-900">
+
+    <!-- Header / Navigasi -->
+    <header class="border-b border-slate-800/80 bg-govblue-900/90 backdrop-blur-md">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <!-- Lambang Kabupaten Ngawi -->
+                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c8/Lambang_Kabupaten_Ngawi_%28svg%29.svg" 
+                     alt="Lambang Kabupaten Ngawi" 
+                     class="w-12 h-12 object-contain"
+                     onerror="this.onerror=null; this.src='https://placehold.co/100?text=Ngawi'">
+                <div>
+                    <h1 class="font-extrabold text-sm sm:text-base tracking-wider text-white">KORWIL SINE</h1>
+                    <p class="text-[10px] sm:text-xs text-slate-400 font-semibold uppercase tracking-widest">Kec. Sine, Kab. Ngawi</p>
+                </div>
+            </div>
+            <div>
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 mr-2 animate-pulse"></span>
+                    Persiapan Sistem
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="max-w-4xl w-full mx-auto px-4 py-10 flex-grow flex flex-col items-center justify-center">
+        
+        <!-- Informasi Status Minimalis -->
+        <div class="text-center max-w-xl mx-auto mb-10">
+            <h2 class="text-2xl sm:text-3xl font-black mb-3 tracking-tight text-white">
+                Sistem Sedang Dioptimalkan
+            </h2>
+            <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                Portal layanan pendidikan Kecamatan Sine sedang dalam proses peningkatan kapasitas server. Silakan coba beberapa saat lagi.
+            </p>
+        </div>
+
+        <!-- Area Game Utama: Sine Match Game -->
+        <div class="w-full max-w-md bg-slate-950/40 border border-slate-800/80 rounded-3xl p-5 sm:p-6 shadow-2xl backdrop-blur-sm">
+            <div class="text-center mb-5">
+                <h3 class="text-lg font-bold text-white flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-gamepad text-accent-teal"></i> Sine Match Game
+                </h3>
+                <p class="text-[11px] text-slate-400">Sembari menunggu, temukan pasangan gambar pendidikan yang sama!</p>
+            </div>
+
+            <!-- Board Game Grid -->
+            <div class="grid grid-cols-4 gap-2.5 mb-5" id="game-board">
+                <!-- Diisi otomatis via JavaScript -->
+            </div>
+            
+            <!-- Panel Kontrol Game -->
+            <div class="flex items-center justify-between bg-slate-900/60 rounded-2xl p-3 border border-slate-800/80 text-xs">
+                <span class="text-slate-400">Langkah: <strong id="game-moves" class="text-white font-mono">0</strong></span>
+                <span class="text-slate-400">Waktu: <strong id="game-timer" class="text-white font-mono">00:00</strong></span>
+                <button id="reset-game-btn" class="px-3 py-1.5 bg-govblue-600 hover:bg-govblue-500 text-white rounded-lg font-bold transition-all active:scale-95 flex items-center gap-1">
+                    <i class="fa-solid fa-rotate-right"></i> Main Lagi
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Modal Popup untuk Kemenangan -->
+    <div id="win-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-[100] p-4">
+        <div class="bg-slate-900 border border-slate-800 p-6 rounded-3xl max-w-xs w-full shadow-2xl transform scale-95 transition-all duration-300 text-center">
+            <div class="w-12 h-12 bg-emerald-500/20 text-emerald-400 rounded-2xl flex items-center justify-center mb-4 mx-auto">
+                <i class="fa-solid fa-trophy text-2xl"></i>
+            </div>
+            <h4 class="text-lg font-bold text-white mb-1">Luar Biasa!</h4>
+            <p class="text-slate-400 text-xs mb-5" id="win-message">Anda berhasil menyelesaikan permainan.</p>
+            <button onclick="closeModal()" class="w-full py-2 bg-accent-teal hover:bg-teal-400 text-govblue-900 font-bold text-xs rounded-xl transition-all">
+                Main Lagi
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer Minimalis -->
+    <footer class="border-t border-slate-800/60 bg-slate-950/20 py-4 text-center text-[10px] sm:text-xs text-slate-500">
+        <div class="max-w-4xl mx-auto px-4">
+            <p>&copy; 2026 KORWIL SINE. Kantor Kecamatan Sine, Kabupaten Ngawi, Jawa Timur.</p>
+        </div>
+    </footer>
+
+    <!-- Logic Permainan -->
+    <script>
+        // Data Ikon Edukasi untuk Game
+        const gameIcons = [
+            { icon: 'fa-book-open', name: 'Buku' },
+            { icon: 'fa-graduation-cap', name: 'Toga' },
+            { icon: 'fa-school', name: 'Sekolah' },
+            { icon: 'fa-pencil', name: 'Pensil' },
+            { icon: 'fa-chalkboard-user', name: 'Guru' },
+            { icon: 'fa-laptop', name: 'Laptop' },
+        ];
+        
+        let doubleIcons = [...gameIcons, ...gameIcons];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let gameMovesCount = 0;
+        let gameInterval = null;
+        let gameSeconds = 0;
+        let gameStarted = false;
+
+        // Acak Kartu
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        // Setup Board Game
+        function createGameBoard() {
+            const board = document.getElementById('game-board');
+            board.innerHTML = '';
+            const shuffledDeck = shuffle([...doubleIcons]);
+
+            shuffledDeck.forEach((cardInfo, index) => {
+                const card = document.createElement('button');
+                card.className = "game-card aspect-square bg-slate-900 border border-slate-800 rounded-2xl flex items-center justify-center text-slate-600 hover:border-slate-700 hover:bg-slate-800/50 transition-all text-lg focus:outline-none relative overflow-hidden";
+                card.dataset.index = index;
+                card.dataset.name = cardInfo.name;
+                card.dataset.icon = cardInfo.icon;
+
+                // Tampilan default (tertutup)
+                card.innerHTML = `
+                    <div class="w-full h-full flex items-center justify-center">
+                        <i class="fa-solid fa-question text-slate-700 text-sm"></i>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => handleCardClick(card));
+                board.appendChild(card);
+            });
+        }
+
+        function handleCardClick(card) {
+            // Validasi klik
+            if (flippedCards.length >= 2 || card.classList.contains('matched') || card.classList.contains('flipped')) return;
+
+            // Mulai waktu saat klik pertama
+            if (!gameStarted) {
+                gameStarted = true;
+                startGameTimer();
+            }
+
+            // Buka kartu
+            card.classList.add('flipped', 'bg-slate-800', 'border-accent-teal');
+            card.innerHTML = `
+                <div class="w-full h-full flex items-center justify-center text-accent-teal">
+                    <i class="fa-solid ${card.dataset.icon}"></i>
+                </div>
+            `;
+
+            flippedCards.push(card);
+
+            if (flippedCards.length === 2) {
+                gameMovesCount++;
+                document.getElementById('game-moves').innerText = gameMovesCount;
+                checkForMatch();
+            }
+        }
+
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
+            
+            if (card1.dataset.name === card2.dataset.name) {
+                // Jika cocok
+                card1.classList.add('matched', 'bg-emerald-500/10', 'border-emerald-500/40');
+                card2.classList.add('matched', 'bg-emerald-500/10', 'border-emerald-500/40');
+                card1.classList.remove('flipped');
+                card2.classList.remove('flipped');
+                
+                flippedCards = [];
+                matchedPairs++;
+
+                // Menang
+                if (matchedPairs === gameIcons.length) {
+                    clearInterval(gameInterval);
+                    setTimeout(() => {
+                        showWinModal(`Selesai dalam ${gameMovesCount} langkah dengan waktu ${formatTime(gameSeconds)}.`);
+                    }, 400);
+                }
+            } else {
+                // Jika tidak cocok, tutup kembali setelah jeda singkat
+                setTimeout(() => {
+                    card1.classList.remove('flipped', 'bg-slate-800', 'border-accent-teal');
+                    card2.classList.remove('flipped', 'bg-slate-800', 'border-accent-teal');
+                    
+                    card1.innerHTML = `<div class="w-full h-full flex items-center justify-center"><i class="fa-solid fa-question text-slate-700 text-sm"></i></div>`;
+                    card2.innerHTML = `<div class="w-full h-full flex items-center justify-center"><i class="fa-solid fa-question text-slate-700 text-sm"></i></div>`;
+                    
+                    flippedCards = [];
+                }, 800);
+            }
+        }
+
+        function startGameTimer() {
+            gameSeconds = 0;
+            gameInterval = setInterval(() => {
+                gameSeconds++;
+                document.getElementById('game-timer').innerText = formatTime(gameSeconds);
+            }, 1000);
+        }
+
+        function formatTime(totalSeconds) {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+        }
+
+        function resetGame() {
+            clearInterval(gameInterval);
+            gameInterval = null;
+            gameSeconds = 0;
+            gameMovesCount = 0;
+            matchedPairs = 0;
+            gameStarted = false;
+            flippedCards = [];
+            document.getElementById('game-moves').innerText = '0';
+            document.getElementById('game-timer').innerText = '00:00';
+            createGameBoard();
+        }
+
+        function showWinModal(msg) {
+            document.getElementById('win-message').textContent = msg;
+            const modal = document.getElementById('win-modal');
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('win-modal').classList.add('hidden');
+            resetGame();
+        }
+
+        document.getElementById('reset-game-btn').addEventListener('click', resetGame);
+
+        // Jalankan game saat halaman selesai dimuat
+        window.onload = function() {
+            createGameBoard();
+        }
+    </script>
+</body>
+</html>
