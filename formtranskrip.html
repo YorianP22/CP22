@@ -20,6 +20,13 @@
 </head>
 <body class="p-4 md:p-8 space-y-8" id="mainBody">
 
+  <header class="max-w-7xl mx-auto flex items-center justify-center md:justify-start gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+    <img src="https://raw.githubusercontent.com/YorianP22/CP22/fe02ac37059dcf92afd39d7ebccc3ab456f66d3e/Logo.png" alt="Logo Korwil Sine" class="h-16 w-auto object-contain">
+    <div class="text-left">
+      <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">KORWIL SINE</h1>
+      <p class="text-xs md:text-sm text-slate-500 font-medium">Bidang Pendidikan dan Kebudayaan</p>
+    </div>
+  </header>
   <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-slate-100">
     <div class="bg-gradient-to-r from-indigo-700 to-indigo-900 p-6 text-white flex flex-col md:flex-row justify-between items-center gap-4">
       <div class="text-center md:text-left">
@@ -212,6 +219,7 @@
 
   </div>
 
+  
   <div id="successModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
     <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full text-center">
       <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-emerald-100 mb-4 text-emerald-600 text-2xl font-bold">✓</div>
@@ -232,7 +240,7 @@
     // =========================================================================
     // KONFIGURASI API (GANTI URL INI SETELAH DEPLOY VORTEX CORE SEBAGAI WEB APP)
     // =========================================================================
-    const API_URL = "https://script.google.com/macros/s/AKfycbz1VdemH36RC70T-nLLJdfAh9Dgi757jnXcO_MnBdQq4zAPVFU0oisw5X2wLpobIL6h0w/exec"; 
+    const API_URL = "URL_VORTEX_CORE_API_DISINI"; 
 
     let payloadData = null;       
     let dbData = [];             
@@ -455,7 +463,7 @@
 
       fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Menggunakan text/plain untuk bypass preflight OPTIONS
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ action: 'submitDataKolektif', payload: payloadData })
       })
       .then(response => response.json())
