@@ -20,30 +20,32 @@
 </head>
 <body class="p-4 md:p-8 space-y-8" id="mainBody">
 
-  <header class="max-w-7xl mx-auto flex items-center justify-center md:justify-start gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-    <img src="https://raw.githubusercontent.com/YorianP22/CP22/fe02ac37059dcf92afd39d7ebccc3ab456f66d3e/Logo.png" alt="Logo Korwil Sine" class="h-16 w-auto object-contain">
-    <div class="text-left">
-      <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">KORWIL SINE</h1>
-      <p class="text-xs md:text-sm text-slate-500 font-medium">Bidang Pendidikan dan Kebudayaan</p>
+  <header class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+    <div class="flex items-center gap-3">
+      <img src="https://raw.githubusercontent.com/YorianP22/CP22/fe02ac37059dcf92afd39d7ebccc3ab456f66d3e/Logo.png" alt="Logo Korwil Sine" class="h-16 w-auto object-contain">
+      <div class="text-left">
+        <h1 class="text-xl md:text-2xl font-bold text-slate-800 tracking-tight">KORWIL SINE</h1>
+        <p class="text-xs md:text-sm text-slate-500 font-medium">Bidang Pendidikan dan Kebudayaan</p>
+      </div>
+    </div>
+    
+    <div class="flex gap-2 flex-wrap justify-center">
+      <a href="https://www.korwilsine.web.id/" target="_self" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-md text-xs transition border border-slate-200 flex items-center gap-1">
+        🏠 Beranda
+      </a>
+      <button onclick="switchTab('input')" id="btnTabInput" class="bg-indigo-600 text-white font-bold px-4 py-2 rounded-md text-xs shadow transition">
+        📝 Input Data
+      </button>
+      <button onclick="switchTab('viewer')" id="btnTabViewer" class="bg-white hover:bg-slate-50 text-slate-700 font-bold px-4 py-2 rounded-md text-xs transition border border-slate-200">
+        📊 Lihat Data (<span id="totalBadge">0</span>)
+      </button>
     </div>
   </header>
   <div class="max-w-7xl mx-auto bg-white rounded-xl shadow-md overflow-hidden border border-slate-100">
     <div class="bg-gradient-to-r from-indigo-700 to-indigo-900 p-6 text-white flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="text-center md:text-left">
+      <div class="text-center md:text-left w-full">
         <h1 class="text-2xl font-bold tracking-wide">FORM TRANSKRIP NILAI 2026</h1>
         <p class="text-indigo-200 text-sm mt-1">Sistem generate transkrip nilai kelas 6 T. A. 2025 - 2026 (Korwil Bidang Pendidikan dan Kebudayaan Kecamatan Sine).</p>
-      </div>
-      <div class="flex gap-2">
-        <a href="https://www.korwilsine.web.id/" target="_self" class="bg-indigo-600/50 hover:bg-indigo-600 text-white font-bold px-4 py-2 rounded-md text-xs transition border border-indigo-500/30 flex items-center gap-1">
-          🏠 Beranda
-        </a>
-
-        <button onclick="switchTab('input')" id="btnTabInput" class="bg-white text-indigo-700 font-bold px-4 py-2 rounded-md text-xs shadow transition">
-          📝 Input Data
-        </button>
-        <button onclick="switchTab('viewer')" id="btnTabViewer" class="bg-indigo-600/50 hover:bg-indigo-600 text-white font-bold px-4 py-2 rounded-md text-xs transition border border-indigo-500/30">
-          📊 Lihat Data (<span id="totalBadge">0</span>)
-        </button>
       </div>
     </div>
 
@@ -219,7 +221,16 @@
 
   </div>
 
-  
+  <footer class="max-w-7xl mx-auto bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      
+      
+    </div>
+    <div class="text-xs text-slate-500 text-center md:text-right">
+      &copy; 2026 Korwil Bidang Pendidikan dan Kebudayaan Kecamatan Sine.<br>
+      Sistem Informasi Oleh <span class="font-semibold text-slate-600">Tim IT Korwil SINE</span>
+    </div>
+  </footer>
   <div id="successModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden z-50">
     <div class="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full text-center">
       <div class="mx-auto flex items-center justify-center h-14 w-14 rounded-full bg-emerald-100 mb-4 text-emerald-600 text-2xl font-bold">✓</div>
@@ -338,14 +349,18 @@
         document.getElementById('inputSection').classList.remove('hidden');
         document.getElementById('viewerSection').classList.add('hidden');
         document.getElementById('previewStage').classList.add('hidden');
-        document.getElementById('btnTabInput').className = "bg-white text-indigo-700 font-bold px-4 py-2 rounded-md text-xs shadow transition";
-        document.getElementById('btnTabViewer').className = "bg-indigo-600/50 hover:bg-indigo-600 text-white font-bold px-4 py-2 rounded-md text-xs transition border border-indigo-500/30";
+        
+        // Penyesuaian class saat tombol pindah ke header putih
+        document.getElementById('btnTabInput').className = "bg-indigo-600 text-white font-bold px-4 py-2 rounded-md text-xs shadow transition";
+        document.getElementById('btnTabViewer').className = "bg-white hover:bg-slate-50 text-slate-700 font-bold px-4 py-2 rounded-md text-xs transition border border-slate-200";
       } else {
         document.getElementById('inputSection').classList.add('hidden');
         document.getElementById('previewStage').classList.add('hidden');
         document.getElementById('viewerSection').classList.remove('hidden');
-        document.getElementById('btnTabInput').className = "bg-indigo-600/50 hover:bg-indigo-600 text-white font-bold px-4 py-2 rounded-md text-xs transition border border-indigo-500/30";
-        document.getElementById('btnTabViewer').className = "bg-white text-indigo-700 font-bold px-4 py-2 rounded-md text-xs shadow transition";
+        
+        // Penyesuaian class saat tombol pindah ke header putih
+        document.getElementById('btnTabInput').className = "bg-white hover:bg-slate-50 text-slate-700 font-bold px-4 py-2 rounded-md text-xs transition border border-slate-200";
+        document.getElementById('btnTabViewer').className = "bg-indigo-600 text-white font-bold px-4 py-2 rounded-md text-xs shadow transition";
         loadDatabaseData(); 
       }
     }
