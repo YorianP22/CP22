@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Unduh E-Presensi Korwil Sine - YoriApp</title>
-    <link rel="icon" href="https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true" type="image/png">
     
+    <link rel="icon" href="favicon.png" type="image/x-icon">
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -83,7 +83,7 @@
 
                     <h1 class="text-3xl font-extrabold text-slate-900 mb-2">E-Presensi Korwil Sine</h1>
                     <p class="text-slate-500 mb-8 leading-relaxed">
-                        Silakan unduh aplikasi presensi digital resmi melalui salah satu server di bawah ini.
+                        Silakan unduh aplikasi presensi digital resmi melalui tombol server di bawah ini.
                     </p>
 
                     <div class="grid grid-cols-2 gap-4 w-full mb-8">
@@ -99,23 +99,34 @@
 
                     <div class="flex flex-col gap-6 w-full mb-8">
                         
-                        <div class="text-left">
-                            <div class="flex items-center mb-2 px-1">
-                                <span class="status-pulse"></span>
-                                <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Server 1 Aktif</span>
+                        <div class="text-left bg-slate-50 p-5 rounded-2xl border border-slate-150 flex flex-col gap-4 shadow-sm">
+                            <div>
+                                <div class="flex items-center mb-2 px-1">
+                                    <span class="status-pulse"></span>
+                                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Server Utama Aktif</span>
+                                </div>
+                                <a href="https://github.com/yorian99/yor-iapp/raw/refs/heads/main/app/E-Presensi%20yapp.apk" 
+                                   class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-xl shadow-md transition-all transform hover:-translate-y-0.5 flex items-center justify-center gap-3 text-lg">
+                                     <i class="fa-solid fa-server"></i>
+                                     Unduh via Server 1
+                                </a>
                             </div>
-                            <a href="https://github.com/yor-ktg2/ep-sine/raw/refs/heads/main/public/apk/sine%20presensi%201.0.2.apk" 
-                               class="w-full bg-slate-600 hover:bg-blue-700 text-white font-bold py-4 px-8 rounded-2xl shadow-lg shadow-blue-100 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-3 text-lg">
-                                <i class="fa-solid fa-server"></i>
-                                Unduh via Server 1
-                            </a>
+                            
+                            <div class="border-t border-slate-200 pt-4">
+                                <span class="block text-[11px] font-medium text-amber-700 mb-2 px-1">
+                                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Bermasalah dengan Server 1? Coba alternatif ini:
+                                </span>
+                                <a href="https://github.com/yorian99/yor-iapp/raw/refs/heads/main/app/E-Presensi%20Sine_signed.apk" 
+                                   class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 px-6 rounded-lg transition-all flex items-center justify-center gap-2 text-sm shadow-sm">
+                                     <i class="fa-solid fa-key"></i>
+                                     Unduh Alternatif Server 1 (Signed APK)
+                                </a>
+                            </div>
                         </div>
-
-                       
 
                     </div>
 
-                    <div class="mt-2 flex items-start gap-3 text-left bg-amber-50 p-4 rounded-xl border border-amber-100">
+                    <div class="mt-2 flex items-start gap-3 text-left bg-amber-50 p-4 rounded-xl border border-amber-100 w-full">
                         <i class="fa-solid fa-circle-info text-amber-500 mt-1"></i>
                         <p class="text-xs text-amber-700 leading-relaxed">
                             <strong>Catatan:</strong> Jika muncul peringatan "File mungkin berbahaya", pilih "Tetap Download". Ini adalah prosedur standar untuk file APK yang diunduh di luar Play Store.
