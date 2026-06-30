@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tarik Tambang Matematika - YoriAPP</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+      overflow: hidden;
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      transition: background 0.5s ease;
+    }
+    
+    body.in-game {
+      background: linear-gradient(to bottom, #87CEEB, #E0F6FF); /* Sky background */
+    }
+
+    /* Custom Scrollbar for Menu */
+    .menu-scroll::-webkit-scrollbar { width: 8px; }
+    .menu-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    .menu-scroll::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 10px; }
+    .menu-scroll::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+
+    /* Rope Mechanics */
+    .rope-pattern {
+      background-image: repeating-linear-gradient(
+        45deg,
+        #8B4513,
+        #8B4513 10px,
+        #A0522D 10px,
+        #A0522D 20px
+      );
+      box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    }
+
+    /* Player Specific Pull Animations to handle flips correctly */
+    @keyframes p1-pull {
+      0% { transform: scaleX(1) rotate(0deg) translateX(0); }
+      50% { transform: scaleX(1) rotate(-15deg) translateX(-10px); }
+      100% { transform: scaleX(1) rotate(0deg) translateX(0); }
+    }
+    
+    @keyframes p2-pull {
+      /* P2 is flipped initially via scaleX(-1), so local -10px is visual right */
+      0% { transform: scaleX(-1) rotate(0deg) translateX(0); }
+      50% { transform: scaleX(-1) rotate(-15deg) translateX(-10px); }
+      100% { transform: scaleX(-1) rotate(0deg) translateX(0); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+    }
+
+    .anim-p1-pull { animation: p1-pull 0.4s ease; }
+    .anim-p2-pull { animation: p2-pull 0.4s ease; }
+    .anim-shake { animation: shake 0.3s ease; color: #ef4444 !important; }
+
+    /* Numpad Button Effects */
+    .btn-numpad {
+      transition: all 0.1s;
+      box-shadow: 0 4px 0 #cbd5e1;
+    }
+    .btn-numpad:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 #cbd5e1;
+    }
+    .btn-action-c { box-shadow: 0 4px 0 #b91c1c; }
+    .btn-action-c:active { box-shadow: 0 0 0 #b91c1c; }
+    .btn-action-go { box-shadow: 0 4px 0 #0369a1; }
+    .btn-action-go:active { box-shadow: 0 0 0 #0369a1; }
+
+    /* Floating elements for background */
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 50px;
+      opacity: 0.8;
+      animation: float 20s linear infinite;
+      z-index: 0;
+      pointer-events: none;
+    }
+    @keyframes float {
+      from { transform: translateX(-100vw); }
+      to { transform: translateX(100vw); }
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col items-center justify-center relative">
+
+  <div id="clouds" class="hidden absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="cloud w-32 h-10 top-10" style="animation-duration: 25s;"></div>
+    <div class="cloud w-48 h-16 top-32" style="animation-duration: 35s; animation-delay: -10s;"></div>
+    <div class="cloud w-24 h-8 top-20" style="animation-duration: 18s; animation-delay: -5s;"></div>
+  </div>
+
+  <!-- Footer YoriAPP -->
+  <div class="fixed bottom-3 w-full flex justify-center z-50 pointer-events-none">
+    <div class="bg-white/90 backdrop-blur-md px-6 py-2 rounded-full shadow-lg border-2 border-white flex items-center gap-2">
+      <span class="text-xl">🌟</span>
+      <span class="font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">YoriAPP</span>
+      <span class="text-gray-500 font-bold text-sm hidden sm:inline">| Tarik Tambang Edukasi</span>
+    </div>
+  </div>
+
+  <div id="welcome-screen" class="z-10 bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-2xl text-center max-w-lg w-[90%] transform transition-all mb-10">
+    <div class="text-6xl mb-4">🏆</div>
+    <h1 class="text-4xl font-black text-gray-800 mb-2 leading-tight">Tarik Tambang<br><span class="text-blue-600">Matematika</span></h1>
+    <p class="text-gray-600 mb-6 font-semibold">Latih kecepatan berhitungmu dalam pertarungan sengit!</p>
+    <div class="bg-blue-50 p-4 rounded-xl mb-6 text-sm text-blue-800 text-left border border-blue-200">
+      <ul class="list-disc pl-5 space-y-1 font-bold">
+        <li>Pemain yang menjawab benar akan menarik tambang ke arahnya.</li>
+        <li>Tarik tambang melewati garis merah untuk menang!</li>
+        <li>Bermainlah secara berhadapan dengan temanmu.</li>
+      </ul>
+    </div>
+    <button onclick="showScreen('menu-screen')" class="w-full bg-gradient-to-r from-green-400 to-green-600 text-white font-black text-xl py-4 rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all">
+      Mulai Bermain
+    </button>
+  </div>
+
+  <div id="menu-screen" class="hidden z-10 bg-white/95 backdrop-blur-md p-6 rounded-3xl shadow-2xl text-center w-[95%] max-w-4xl max-h-[85vh] mb-10 flex flex-col">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-3xl font-black text-gray-800">Pilih Mode</h2>
+      <button onclick="showScreen('welcome-screen')" class="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition">
+        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    
+    <div class="menu-scroll grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 overflow-y-auto pr-2 pb-4 flex-1">
+      <!-- Dasar -->
+      <button onclick="startGame('tambah')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all">
+        <span class="text-3xl mb-1 group-hover:scale-110 transition">➕</span><span class="text-sm font-bold text-gray-700">Tambah</span>
+      </button>
+      <button onclick="startGame('kurang')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-red-500 hover:bg-red-50 transition-all">
+        <span class="text-3xl mb-1 group-hover:scale-110 transition">➖</span><span class="text-sm font-bold text-gray-700">Kurang</span>
+      </button>
+      <button onclick="startGame('kali')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-purple-500 hover:bg-purple-50 transition-all">
+        <span class="text-3xl mb-1 group-hover:scale-110 transition">✖️</span><span class="text-sm font-bold text-gray-700">Kali</span>
+      </button>
+      <button onclick="startGame('bagi')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-yellow-500 hover:bg-yellow-50 transition-all">
+        <span class="text-3xl mb-1 group-hover:scale-110 transition">➗</span><span class="text-sm font-bold text-gray-700">Bagi</span>
+      </button>
+      <button onclick="startGame('campuran_dasar')" class="group flex flex-col items-center justify-center p-4 bg-indigo-50 border-2 border-indigo-200 rounded-2xl hover:border-indigo-500 transition-all">
+        <span class="text-3xl mb-1 group-hover:scale-110 transition">🎲</span><span class="text-sm font-bold text-indigo-700">Mix Dasar</span>
+      </button>
+
+      <!-- Menengah -->
+      <button onclick="startGame('pangkat2')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all">
+        <span class="text-3xl mb-1 font-black text-gray-700 group-hover:text-blue-600">x²</span><span class="text-sm font-bold text-gray-700">Pangkat 2</span>
+      </button>
+      <button onclick="startGame('pangkat3')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all">
+        <span class="text-3xl mb-1 font-black text-gray-700 group-hover:text-blue-600">x³</span><span class="text-sm font-bold text-gray-700">Pangkat 3</span>
+      </button>
+      <button onclick="startGame('akar2')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all">
+        <span class="text-3xl mb-1 font-black text-gray-700 group-hover:text-blue-600">√</span><span class="text-sm font-bold text-gray-700">Akar</span>
+      </button>
+      <button onclick="startGame('akar3')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all">
+        <span class="text-3xl mb-1 font-black text-gray-700 group-hover:text-blue-600">∛</span><span class="text-sm font-bold text-gray-700">Akar 3</span>
+      </button>
+      <button onclick="startGame('campuran_kompleks')" class="group flex flex-col items-center justify-center p-4 bg-indigo-50 border-2 border-indigo-200 rounded-2xl hover:border-indigo-500 transition-all">
+        <span class="text-3xl mb-1 group-hover:scale-110 transition">🤯</span><span class="text-sm font-bold text-indigo-700">Mix Kompleks</span>
+      </button>
+
+      <!-- Advanced / Variasi -->
+      <button onclick="startGame('tambah2')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-green-500 hover:bg-green-50 transition-all">
+        <span class="text-2xl mb-1 font-black text-gray-700">+99</span><span class="text-sm font-bold text-gray-700">2 Digit +</span>
+      </button>
+      <button onclick="startGame('kurang2')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-red-500 hover:bg-red-50 transition-all">
+        <span class="text-2xl mb-1 font-black text-gray-700">-99</span><span class="text-sm font-bold text-gray-700">2 Digit -</span>
+      </button>
+      <button onclick="startGame('tambah_kurang')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-orange-500 hover:bg-orange-50 transition-all">
+        <span class="text-3xl mb-1 font-black text-gray-700">±</span><span class="text-sm font-bold text-gray-700">Tambah Kurang</span>
+      </button>
+      <button onclick="startGame('kali_bagi')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-teal-500 hover:bg-teal-50 transition-all">
+        <span class="text-3xl mb-1 font-black text-gray-700">×÷</span><span class="text-sm font-bold text-gray-700">Kali Bagi</span>
+      </button>
+      <button onclick="startGame('persen')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-pink-500 hover:bg-pink-50 transition-all">
+        <span class="text-3xl mb-1 font-black text-gray-700">%</span><span class="text-sm font-bold text-gray-700">Persen</span>
+      </button>
+
+      <!-- Lainnya -->
+      <button onclick="startGame('fpb')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-cyan-500 hover:bg-cyan-50 transition-all">
+        <span class="text-2xl mb-1 font-black text-gray-700">FPB</span><span class="text-sm font-bold text-gray-700">FPB</span>
+      </button>
+      <button onclick="startGame('kpk')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-cyan-500 hover:bg-cyan-50 transition-all">
+        <span class="text-2xl mb-1 font-black text-gray-700">KPK</span><span class="text-sm font-bold text-gray-700">KPK</span>
+      </button>
+      <button onclick="startGame('waktu')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-yellow-600 hover:bg-yellow-50 transition-all">
+        <span class="text-3xl mb-1 transition">🕒</span><span class="text-sm font-bold text-gray-700">Waktu</span>
+      </button>
+      <button onclick="startGame('jarak')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-gray-600 hover:bg-gray-100 transition-all">
+        <span class="text-3xl mb-1 transition">📏</span><span class="text-sm font-bold text-gray-700">Jarak</span>
+      </button>
+      <button onclick="startGame('buah')" class="group flex flex-col items-center justify-center p-4 bg-gray-50 border-2 border-gray-200 rounded-2xl hover:border-rose-500 hover:bg-rose-50 transition-all">
+        <span class="text-3xl mb-1 transition">🍉</span><span class="text-sm font-bold text-gray-700">Hitung Buah</span>
+      </button>
+    </div>
+  </div>
+
+  <div id="game-screen" class="hidden w-full h-full flex flex-col z-10 pb-12">
+    
+    <!-- Floating Exit Button -->
+    <div class="absolute top-4 right-4 z-50">
+      <button onclick="confirmExit()" class="bg-white/80 hover:bg-red-500 hover:text-white text-red-500 backdrop-blur-md rounded-full p-3 shadow-lg transition-all border-2 border-red-200 flex items-center justify-center gap-2 group">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+        <span class="font-bold hidden group-hover:block px-1">Keluar</span>
+      </button>
+    </div>
+
+    <!-- Main Game Area -->
+    <div class="flex-1 flex flex-col md:flex-row w-full max-w-7xl mx-auto p-4 md:p-6 gap-6 items-center justify-between">
+      
+      <!-- Player 1 Panel (Blue) -->
+      <div class="w-full md:w-80 bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border-4 border-blue-400 flex flex-col overflow-hidden relative">
+        <div class="bg-blue-500 text-white text-center py-2 font-black tracking-widest uppercase">Tim Biru</div>
+        <!-- Question -->
+        <div id="q-p1" class="h-24 sm:h-32 flex items-center justify-center text-3xl sm:text-4xl font-black text-gray-800 p-4 text-center break-words leading-tight"></div>
+        <!-- Input -->
+        <div class="px-4 pb-2">
+          <div id="in-p1" class="w-full h-14 bg-gray-100 rounded-xl border-2 border-gray-300 flex items-center justify-center text-3xl font-bold text-blue-600 transition-colors"></div>
+        </div>
+        <!-- Numpad P1 -->
+        <div class="grid grid-cols-3 gap-2 p-4 bg-gray-50 flex-1">
+          <button onclick="pressKey(1, '1')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700 py-3 sm:py-4">1</button>
+          <button onclick="pressKey(1, '2')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">2</button>
+          <button onclick="pressKey(1, '3')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">3</button>
+          <button onclick="pressKey(1, '4')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700 py-3 sm:py-4">4</button>
+          <button onclick="pressKey(1, '5')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">5</button>
+          <button onclick="pressKey(1, '6')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">6</button>
+          <button onclick="pressKey(1, '7')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700 py-3 sm:py-4">7</button>
+          <button onclick="pressKey(1, '8')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">8</button>
+          <button onclick="pressKey(1, '9')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">9</button>
+          <button onclick="pressKey(1, 'C')" class="btn-numpad btn-action-c bg-red-500 border border-red-600 rounded-xl text-2xl font-bold text-white py-3 sm:py-4">C</button>
+          <button onclick="pressKey(1, '0')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">0</button>
+          <button onclick="pressKey(1, 'Go')" class="btn-numpad btn-action-go bg-blue-500 border border-blue-600 rounded-xl text-2xl font-bold text-white shadow-md">Go</button>
+        </div>
+      </div>
+
+      <div class="flex-1 w-full relative h-48 md:h-64 flex items-center justify-center mx-4 my-2 md:my-0 overflow-hidden rounded-3xl bg-white/50 backdrop-blur-md border-2 border-white/80 shadow-inner">
+        <!-- Ground/Grass Base -->
+        <div class="absolute bottom-0 w-full h-1/4 bg-gradient-to-t from-green-500 to-green-400 rounded-b-2xl border-t-4 border-green-600/30"></div>
+        
+        <!-- Center Warning Line -->
+        <div class="absolute h-full w-2 bg-red-500/50 z-0"></div>
+        <div class="absolute bottom-4 text-red-700 font-bold bg-white/80 px-3 py-1 rounded-full text-xs shadow">Batas Kalah</div>
+
+        <!-- Indicator Bubbles -->
+        <div class="absolute top-3 left-4 bg-blue-500 text-white font-bold px-4 py-1.5 rounded-full shadow border-2 border-white z-20">Skor: <span id="score-p1">0</span></div>
+        <div class="absolute top-3 right-4 bg-red-500 text-white font-bold px-4 py-1.5 rounded-full shadow border-2 border-white z-20">Skor: <span id="score-p2">0</span></div>
+
+        <!-- The Rope Assembly -->
+        <div id="rope-assembly" class="relative flex items-center justify-center w-full max-w-lg transition-transform duration-500 ease-out z-10" style="transform: translateX(0px);">
+          
+          <!-- The Rope Line -->
+          <div class="absolute w-[150%] h-4 rope-pattern rounded-full shadow-md z-0"></div>
+          
+          <!-- Center Ribbon/Knot -->
+          <div class="absolute w-6 h-12 bg-yellow-400 border-2 border-yellow-600 z-10 flex items-center justify-center shadow-lg" style="border-radius: 4px;">
+            <div class="w-full h-2 bg-red-500"></div>
+          </div>
+
+          <!-- SD Characters Container -->
+          <div class="w-full flex justify-between absolute px-10 md:px-16 items-center pointer-events-none">
+            
+            <!-- Player 1 Character (SD Boy - Blue Side, facing Right) -->
+            <div id="char-p1" class="w-24 h-24 md:w-32 md:h-32 origin-bottom transition-transform transform scale-x-100">
+              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xl">
+                <!-- Head -->
+                <circle cx="50" cy="35" r="16" fill="#fcd5ce"/>
+                <path d="M 34 35 C 34 10, 66 10, 66 35" fill="#212529"/> <!-- Hair -->
+                <circle cx="58" cy="33" r="2.5" fill="#000"/> <!-- Eye -->
+                <path d="M 55 40 Q 60 43 62 38" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"/> <!-- Smile -->
+                <!-- Hat (Red SD) -->
+                <path d="M 30 25 C 30 10, 70 10, 70 25 Z" fill="#e63946"/>
+                <path d="M 65 25 L 80 25 C 80 28, 65 28, 65 28 Z" fill="#e63946"/> <!-- visor -->
+                <!-- Body (White Shirt) -->
+                <path d="M 38 50 L 62 50 L 58 70 L 42 70 Z" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+                <rect x="41" y="68" width="18" height="4" fill="#343a40"/> <!-- Belt -->
+                <!-- Shorts (Red) -->
+                <path d="M 40 72 L 60 72 L 62 85 L 53 85 L 50 78 L 47 85 L 38 85 Z" fill="#e63946"/>
+                <!-- Arms (Pulling Right) -->
+                <path d="M 45 55 L 85 62" fill="none" stroke="#fcd5ce" stroke-width="7" stroke-linecap="round"/>
+                <path d="M 42 60 L 80 70" fill="none" stroke="#fcd5ce" stroke-width="7" stroke-linecap="round"/>
+                <circle cx="85" cy="62" r="4" fill="#fcd5ce"/>
+                <circle cx="80" cy="70" r="4" fill="#fcd5ce"/>
+                <!-- Legs & Shoes -->
+                <rect x="41" y="85" width="6" height="10" fill="#fcd5ce"/>
+                <rect x="53" y="85" width="6" height="10" fill="#fcd5ce"/>
+                <path d="M 39 95 C 39 90, 49 90, 49 95 L 49 98 L 39 98 Z" fill="#212529"/>
+                <path d="M 51 95 C 51 90, 61 90, 61 95 L 61 98 L 51 98 Z" fill="#212529"/>
+              </svg>
+            </div>
+
+            <!-- Player 2 Character (SD Girl - Red Side, drawn facing Right, flipped to face Left) -->
+            <div id="char-p2" class="w-24 h-24 md:w-32 md:h-32 origin-bottom transition-transform transform scale-x-[-1]">
+              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-xl">
+                <!-- Ponytail back -->
+                <path d="M 30 35 C 15 40, 20 60, 35 50" fill="#212529"/>
+                <!-- Head -->
+                <circle cx="50" cy="35" r="16" fill="#fcd5ce"/>
+                <path d="M 34 35 C 34 15, 66 15, 66 35" fill="#212529"/> <!-- Hair Base -->
+                <circle cx="58" cy="35" r="2.5" fill="#000"/> <!-- Eye -->
+                <path d="M 55 42 Q 60 45 62 40" fill="none" stroke="#000" stroke-width="1.5" stroke-linecap="round"/> <!-- Smile -->
+                <!-- Hair Tie -->
+                <circle cx="33" cy="35" r="4" fill="#e63946"/>
+                <!-- Body (White Shirt) -->
+                <path d="M 38 50 L 62 50 L 58 68 L 42 68 Z" fill="#f8f9fa" stroke="#dee2e6" stroke-width="2"/>
+                <rect x="41" y="66" width="18" height="4" fill="#343a40"/> <!-- Belt -->
+                <!-- Skirt (Red) -->
+                <path d="M 40 68 L 60 68 L 65 85 L 35 85 Z" fill="#e63946"/>
+                <!-- Arms (Pulling Right -> becomes Left when flipped) -->
+                <path d="M 45 55 L 85 62" fill="none" stroke="#fcd5ce" stroke-width="6" stroke-linecap="round"/>
+                <path d="M 42 60 L 80 70" fill="none" stroke="#fcd5ce" stroke-width="6" stroke-linecap="round"/>
+                <circle cx="85" cy="62" r="3.5" fill="#fcd5ce"/>
+                <circle cx="80" cy="70" r="3.5" fill="#fcd5ce"/>
+                <!-- Legs & Shoes -->
+                <rect x="42" y="85" width="5" height="10" fill="#fcd5ce"/>
+                <rect x="53" y="85" width="5" height="10" fill="#fcd5ce"/>
+                <path d="M 40 95 C 40 90, 48 90, 48 95 L 48 98 L 40 98 Z" fill="#212529"/>
+                <path d="M 51 95 C 51 90, 59 90, 59 95 L 59 98 L 51 98 Z" fill="#212529"/>
+              </svg>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Player 2 Panel (Red) -->
+      <div class="w-full md:w-80 bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border-4 border-red-400 flex flex-col overflow-hidden relative">
+        <div class="bg-red-500 text-white text-center py-2 font-black tracking-widest uppercase">Tim Merah</div>
+        <!-- Question -->
+        <div id="q-p2" class="h-24 sm:h-32 flex items-center justify-center text-3xl sm:text-4xl font-black text-gray-800 p-4 text-center break-words leading-tight"></div>
+        <!-- Input -->
+        <div class="px-4 pb-2">
+          <div id="in-p2" class="w-full h-14 bg-gray-100 rounded-xl border-2 border-gray-300 flex items-center justify-center text-3xl font-bold text-red-600 transition-colors"></div>
+        </div>
+        <!-- Numpad P2 -->
+        <div class="grid grid-cols-3 gap-2 p-4 bg-gray-50 flex-1">
+          <button onclick="pressKey(2, '1')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700 py-3 sm:py-4">1</button>
+          <button onclick="pressKey(2, '2')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">2</button>
+          <button onclick="pressKey(2, '3')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">3</button>
+          <button onclick="pressKey(2, '4')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700 py-3 sm:py-4">4</button>
+          <button onclick="pressKey(2, '5')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">5</button>
+          <button onclick="pressKey(2, '6')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">6</button>
+          <button onclick="pressKey(2, '7')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700 py-3 sm:py-4">7</button>
+          <button onclick="pressKey(2, '8')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">8</button>
+          <button onclick="pressKey(2, '9')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">9</button>
+          <button onclick="pressKey(2, 'C')" class="btn-numpad btn-action-c bg-red-500 border border-red-600 rounded-xl text-2xl font-bold text-white py-3 sm:py-4">C</button>
+          <button onclick="pressKey(2, '0')" class="btn-numpad bg-white border border-gray-200 rounded-xl text-2xl font-bold text-gray-700">0</button>
+          <button onclick="pressKey(2, 'Go')" class="btn-numpad btn-action-go bg-blue-500 border border-blue-600 rounded-xl text-2xl font-bold text-white shadow-md">Go</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Winner Modal -->
+  <div id="winner-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center backdrop-blur-sm">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl text-center max-w-md w-[90%] transform scale-100 transition-transform duration-300">
+      <div id="winner-icon" class="text-7xl mb-4">🏆</div>
+      <h2 id="winner-text" class="text-4xl font-black mb-2 text-gray-800">Tim Menang!</h2>
+      <p class="text-gray-500 mb-6 font-semibold">Pertarungan yang sangat hebat!</p>
+      <div class="flex gap-4 justify-center">
+        <button onclick="closeWinnerModal(); startGame(currentMode);" class="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:scale-105 text-white font-bold py-3 rounded-xl transition shadow">Main Lagi</button>
+        <button onclick="closeWinnerModal(); showScreen('menu-screen');" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-xl transition shadow">Ganti Mode</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exit Confirm Modal -->
+  <div id="exit-modal" class="hidden fixed inset-0 bg-black/60 z-[100] flex items-center justify-center backdrop-blur-sm">
+    <div class="bg-white p-6 rounded-3xl shadow-2xl text-center max-w-sm w-[90%] border-t-8 border-red-500">
+      <h3 class="text-2xl font-bold text-gray-800 mb-4">Keluar Permainan?</h3>
+      <p class="text-gray-600 mb-6">Progres pertandingan saat ini akan hilang.</p>
+      <div class="flex gap-4">
+        <button onclick="hideExitModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 rounded-xl transition">Batal</button>
+        <button onclick="executeExit()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl transition shadow-md">Ya, Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Game State
+    let currentMode = '';
+    let tugPosition = 0; 
+    let pointsP1 = 0;
+    let pointsP2 = 0;
+    const WIN_THRESHOLD = 5; 
+    let MOVE_STEP = 0;
+    let ansP1 = 0;
+    let ansP2 = 0;
+
+    // Math Helpers
+    function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+    function lcm(a, b) { return (a * b) / gcd(a, b); }
+    function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1) + min); }
+
+    // Screen Management
+    function showScreen(screenId) {
+      document.getElementById('welcome-screen').classList.add('hidden');
+      document.getElementById('menu-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('clouds').classList.remove('hidden'); 
+      
+      document.getElementById(screenId).classList.remove('hidden');
+      
+      if (screenId === 'game-screen') {
+        document.body.classList.add('in-game');
+        document.getElementById('clouds').classList.add('hidden');
+        setTimeout(calculateMoveStep, 100); // Allow render before calc
+        window.addEventListener('resize', calculateMoveStep);
+      } else {
+        document.body.classList.remove('in-game');
+        window.removeEventListener('resize', calculateMoveStep);
+      }
+    }
+
+    // Responsive Rope Movement calculation
+    function calculateMoveStep() {
+      const ropeContainer = document.getElementById('rope-assembly').parentElement;
+      if(!ropeContainer) return;
+      const ropeContainerWidth = ropeContainer.clientWidth;
+      // WIN_THRESHOLD pulls the knot near the edge (approx 40% of container width)
+      MOVE_STEP = (ropeContainerWidth * 0.4) / WIN_THRESHOLD;
+      updateRopePosition(false); 
+    }
+
+    function requestFullScreen() {
+      const docElm = document.documentElement;
+      if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+        if (docElm.requestFullscreen) {
+            docElm.requestFullscreen().catch(err => console.log("FS error:", err));
+        } else if (docElm.msRequestFullscreen) {
+            docElm.msRequestFullscreen();
+        } else if (docElm.mozRequestFullScreen) {
+            docElm.mozRequestFullScreen();
+        } else if (docElm.webkitRequestFullScreen) {
+            docElm.webkitRequestFullScreen();
+        }
+      }
+    }
+
+    function exitFullScreen() {
+      if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement) {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+      }
+    }
+
+    function startGame(mode) {
+      currentMode = mode;
+      tugPosition = 0;
+      pointsP1 = 0;
+      pointsP2 = 0;
+      document.getElementById('score-p1').innerText = pointsP1;
+      document.getElementById('score-p2').innerText = pointsP2;
+      
+      document.getElementById('in-p1').innerText = '';
+      document.getElementById('in-p2').innerText = '';
+      
+      requestFullScreen(); 
+      showScreen('game-screen');
+      
+      generateQuestion(1);
+      generateQuestion(2);
+      updateRopePosition(false);
+    }
+
+    function confirmExit() { document.getElementById('exit-modal').classList.remove('hidden'); }
+    function hideExitModal() { document.getElementById('exit-modal').classList.add('hidden'); }
+    
+    function executeExit() {
+      hideExitModal();
+      exitFullScreen();
+      showScreen('menu-screen');
+    }
+
+    function generateQuestion(player) {
+      let qText = "";
+      let answer = 0;
+      let activeMode = currentMode;
+
+      // Handle Random Modes
+      if (activeMode === 'campuran_dasar') {
+        const modes = ['tambah', 'kurang', 'kali', 'bagi'];
+        activeMode = modes[randomInt(0, 3)];
+      } else if (activeMode === 'campuran_kompleks') {
+        const modes = ['tambah', 'kurang', 'kali', 'bagi', 'pangkat2', 'akar2'];
+        activeMode = modes[randomInt(0, 5)];
+      } else if (activeMode === 'tambah_kurang') {
+        activeMode = randomInt(0, 1) === 0 ? 'tambah2' : 'kurang2';
+      } else if (activeMode === 'kali_bagi') {
+        activeMode = randomInt(0, 1) === 0 ? 'kali2' : 'bagi2';
+      }
+
+      switch (activeMode) {
+        case 'tambah':
+          let a1 = randomInt(1, 20), b1 = randomInt(1, 20);
+          qText = `${a1} + ${b1}`; answer = a1 + b1; break;
+        case 'kurang':
+          let a2 = randomInt(10, 30), b2 = randomInt(1, a2);
+          qText = `${a2} - ${b2}`; answer = a2 - b2; break;
+        case 'kali':
+          let a3 = randomInt(2, 10), b3 = randomInt(2, 10);
+          qText = `${a3} × ${b3}`; answer = a3 * b3; break;
+        case 'bagi':
+          let b4 = randomInt(2, 10), ans4 = randomInt(2, 10);
+          qText = `${b4 * ans4} ÷ ${b4}`; answer = ans4; break;
+        case 'pangkat2':
+          let n2 = randomInt(2, 15);
+          qText = `${n2}²`; answer = n2 * n2; break;
+        case 'pangkat3':
+          let n3 = randomInt(2, 10);
+          qText = `${n3}³`; answer = n3 * n3 * n3; break;
+        case 'akar2':
+          let ansRt2 = randomInt(2, 15);
+          qText = `√${ansRt2 * ansRt2}`; answer = ansRt2; break;
+        case 'akar3':
+          let ansRt3 = randomInt(2, 10);
+          qText = `∛${ansRt3 * ansRt3 * ansRt3}`; answer = ansRt3; break;
+        case 'tambah2':
+          let a5 = randomInt(10, 99), b5 = randomInt(10, 99);
+          qText = `${a5} + ${b5}`; answer = a5 + b5; break;
+        case 'kurang2':
+          let a6 = randomInt(20, 99), b6 = randomInt(10, a6);
+          qText = `${a6} - ${b6}`; answer = a6 - b6; break;
+        case 'kali2':
+          let a7 = randomInt(11, 25), b7 = randomInt(2, 9);
+          qText = `${a7} × ${b7}`; answer = a7 * b7; break;
+        case 'bagi2':
+          let b8 = randomInt(11, 25), ans8 = randomInt(2, 9);
+          qText = `${b8 * ans8} ÷ ${b8}`; answer = ans8; break;
+        case 'persen':
+          let p = randomInt(1, 9) * 10; let val = randomInt(1, 10) * 100;
+          qText = `${p}% dari ${val}`; answer = (p/100) * val; break;
+        case 'fpb':
+          let f1 = randomInt(2, 6) * randomInt(1,3), f2 = randomInt(2, 6) * randomInt(1,3);
+          qText = `FPB(${f1}, ${f2})`; answer = gcd(f1, f2); break;
+        case 'kpk':
+          let k1 = randomInt(2, 6), k2 = randomInt(2, 6);
+          qText = `KPK(${k1}, ${k2})`; answer = lcm(k1, k2); break;
+        case 'waktu':
+          let m = randomInt(1, 3);
+          qText = `${m} jam = ... mnt`; answer = m * 60; break;
+        case 'jarak':
+          let km = randomInt(1, 5);
+          qText = `${km} km = ... m`; answer = km * 1000; break;
+        case 'buah':
+          let count = randomInt(1, 9);
+          const fruits = ['🍉', '🍎', '🍌', '🍓', '🍇', '🍊'];
+          let selectedFruit = fruits[randomInt(0, fruits.length - 1)];
+          qText = Array(count).fill(selectedFruit).join(' '); 
+          answer = count; 
+          break;
+        default:
+          qText = "1 + 1"; answer = 2;
+      }
+
+      if(player === 1) { 
+        document.getElementById('q-p1').innerText = qText; 
+        ansP1 = answer; 
+        document.getElementById('in-p1').innerText = ''; 
+      } else { 
+        document.getElementById('q-p2').innerText = qText; 
+        ansP2 = answer; 
+        document.getElementById('in-p2').innerText = ''; 
+      }
+    }
+
+    function pressKey(player, key) {
+      let inEl = document.getElementById(`in-p${player}`);
+      let current = inEl.innerText;
+      
+      if (key === 'C') {
+        inEl.innerText = '';
+      } else if (key === 'Go') {
+        if(current !== '') checkAnswer(player, parseInt(current));
+      } else {
+        if (current.length < 5) inEl.innerText += key;
+      }
+    }
+
+    function checkAnswer(player, userAns) {
+      let correctAns = player === 1 ? ansP1 : ansP2;
+      let inEl = document.getElementById(`in-p${player}`);
+      let charEl = document.getElementById(`char-p${player}`);
+
+      if (userAns === correctAns) {
+         // Correct Answer Animation & Logic
+         inEl.classList.add('bg-green-200', 'text-green-800');
+         setTimeout(() => inEl.classList.remove('bg-green-200', 'text-green-800'), 300);
+
+         if (player === 1) {
+           // Player 1 (Left) pulls -> rope moves left (negative X)
+           tugPosition--; 
+           pointsP1++;
+           document.getElementById('score-p1').innerText = pointsP1;
+           
+           // Animate SD Boy pulling
+           charEl.classList.add('anim-p1-pull');
+           setTimeout(() => charEl.classList.remove('anim-p1-pull'), 400);
+         } else {
+           // Player 2 (Right) pulls -> rope moves right (positive X)
+           tugPosition++; 
+           pointsP2++;
+           document.getElementById('score-p2').innerText = pointsP2;
+           
+           // Animate SD Girl pulling
+           charEl.classList.add('anim-p2-pull');
+           setTimeout(() => charEl.classList.remove('anim-p2-pull'), 400);
+         }
+         
+         updateRopePosition(true);
+         generateQuestion(player);
+         
+         // Slight delay before checking win to allow animation to play
+         setTimeout(checkWin, 500); 
+      } else {
+         // Wrong Answer Animation
+         inEl.classList.add('bg-red-200', 'anim-shake');
+         setTimeout(() => {
+           inEl.classList.remove('bg-red-200', 'anim-shake');
+           inEl.innerText = '';
+         }, 300);
+      }
+    }
+
+    function updateRopePosition(animate = true) {
+       let rope = document.getElementById('rope-assembly');
+       if (animate) rope.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+       else rope.style.transition = 'none';
+
+       // tugPosition: negative means pulled towards left (P1). positive means pulled towards right (P2)
+       let px = tugPosition * MOVE_STEP;
+       rope.style.transform = `translateX(${px}px)`;
+    }
+
+    function checkWin() {
+      if (Math.abs(tugPosition) >= WIN_THRESHOLD) {
+         let p1Wins = tugPosition <= -WIN_THRESHOLD;
+         let winnerText = p1Wins ? "Tim Biru Menang!" : "Tim Merah Menang!";
+         let winnerColor = p1Wins ? "text-blue-600" : "text-red-600";
+         let winnerIcon = p1Wins ? "👦🏻🏆" : "👧🏻🏆";
+         
+         document.getElementById('winner-icon').innerText = winnerIcon;
+         document.getElementById('winner-text').innerText = winnerText;
+         document.getElementById('winner-text').className = `text-4xl font-black mb-2 ${winnerColor}`;
+         document.getElementById('winner-modal').classList.remove('hidden');
+      }
+    }
+
+    function closeWinnerModal() {
+       document.getElementById('winner-modal').classList.add('hidden');
+    }
+
+  </script>
+</body>
+</html>

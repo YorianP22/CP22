@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unduh Sertifikat - KORWILDIKBUD KEC. SINE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .table-container::-webkit-scrollbar { height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col text-slate-800 selection:bg-blue-100 selection:text-blue-900">
+
+    <header class="bg-white border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+        <div class="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="https://www.korwilsine.web.id/asas" class="flex items-center gap-3 group">
+
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Lambang_Kabupaten_Ngawi_%28svg%29.svg/1280px-Lambang_Kabupaten_Ngawi_%28svg%29.svg.png" 
+                     alt="Logo Ngawi" class="h-9 w-auto group-hover:scale-105 transition-transform">
+                <div class="hidden sm:block">
+                    <h1 class="text-sm font-bold text-gray-900">KORWILDIKBUD KEC. SINE</h1>
+                    <p class="text-[10px] text-gray-400 font-semibold uppercase">Asesmen Akhir Semester Berbasis Daring</p>
+                </div>
+            </a>
+            <button class="xl:hidden text-gray-500 hover:text-gray-900"><i class="fas fa-bars text-xl"></i></button>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col">
+        <div class="bg-white rounded-2xl shadow-[0_2px_20px_rgb(0,0,0,0.04)] border border-gray-100 p-6 sm:p-10 w-full">
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center mx-auto mb-5 shadow-sm">
+                    <i class="fas fa-cloud-download-alt text-2xl"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">Unduh Sertifikat</h2>
+                <p class="text-sm text-slate-500 max-w-xl mx-auto">Gunakan pencarian dan filter untuk menemukan sertifikat Anda.</p>
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-3 mb-8 w-full">
+                <div class="w-full md:w-1/2 relative">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-slate-400 text-sm"></i>
+                    </div>
+                    <input type="text" id="searchName" placeholder="Ketik nama untuk mencari..." 
+                           class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all shadow-sm">
+                </div>
+                <div class="w-full md:w-1/4 relative">
+                    <select id="filterLembaga" class="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer">
+                        <option value="">Semua Lembaga</option>
+                    </select>
+                </div>
+                <div class="w-full md:w-1/4 relative">
+                    <select id="filterKelas" class="w-full pl-4 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer">
+                        <option value="">Semua Kelas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+                <div class="table-container overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200 text-left text-sm whitespace-nowrap">
+                        <thead class="bg-slate-50 text-slate-600 font-bold text-[11px] uppercase tracking-wider">
+                            <tr><th class="px-6 py-4 w-16 text-center">NO</th><th class="px-6 py-4">NAMA LENGKAP</th><th class="px-6 py-4 text-center">KELAS</th><th class="px-6 py-4">LEMBAGA</th><th class="px-6 py-4 text-center w-32">AKSI UNDUH</th></tr>
+                        </thead>
+                        <tbody id="dataTable" class="divide-y divide-slate-100 bg-white"></tbody>
+                    </table>
+                </div>
+                <div id="loadingState" class="py-16 text-center bg-white flex flex-col items-center justify-center">
+                    <i class="fas fa-circle-notch fa-spin text-3xl text-blue-500 mb-4"></i>
+                    <p class="text-sm font-medium text-slate-500">Menghubungkan ke Database...</p>
+                </div>
+                <div id="emptyState" class="hidden py-16 text-center bg-white flex flex-col items-center justify-center">
+                    <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4"><i class="fas fa-file-excel text-2xl text-slate-400"></i></div>
+                    <h3 class="text-lg font-bold text-slate-700 mb-1">Data tidak ditemukan</h3>
+                    <p class="text-sm text-slate-500">Coba sesuaikan kata kunci pencarian atau filter Anda.</p>
+                </div>
+                <div id="paginationContainer" class="hidden justify-center py-5 px-4 border-t border-slate-200 bg-white">
+                    <nav class="inline-flex flex-wrap justify-center gap-1.5" aria-label="Pagination"></nav>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-auto border-t border-gray-200 bg-white py-6">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-[11px] font-bold text-gray-400 uppercase">Arsip Digital Korwil Sine</p>
+            <p class="text-[10px] text-gray-400">Support@Yor.iAPP</p>
+        </div>
+    </footer>
+
+    <script>
+       
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQTFarlG-i441pLW8eZ4p2u4y2T_q-jgwQgHZ9K3CO_7xUP98Rb3Bl6c6RB1qofjid/exec'; 
+
+        let allData = [];
+        const ROWS_PER_PAGE = 10;
+        let currentPage = 1;
+
+     
+        function fetchData() {
+            const loadingDiv = document.getElementById('loadingState');
+            loadingDiv.classList.remove('hidden');
+            loadingDiv.innerHTML = `<i class="fas fa-circle-notch fa-spin text-3xl text-blue-500 mb-4"></i><p class="text-sm">Memuat data...</p>`;
+            
+            const callbackName = 'jsonpCallback_' + Date.now() + '_' + Math.floor(Math.random() * 100000);
+            window[callbackName] = function(response) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                if (response && response.error) {
+                    showError(response.error);
+                } else if (Array.isArray(response)) {
+                    initData(response);
+                } else {
+                    showError('Format data tidak valid dari server.');
+                }
+            };
+            
+            const script = document.createElement('script');
+            script.src = `${APPS_SCRIPT_URL}?callback=${callbackName}&t=${Date.now()}`;
+            script.onerror = function() {
+                delete window[callbackName];
+                showError('Gagal menghubungi server. Periksa URL Apps Script dan pastikan sudah di-deploy sebagai Web App dengan akses "Anyone".');
+            };
+            document.body.appendChild(script);
+            
+            // Timeout 15 detik
+            setTimeout(() => {
+                if (window[callbackName]) {
+                    delete window[callbackName];
+                    showError('Timeout: Server tidak merespon dalam 15 detik.');
+                }
+            }, 15000);
+        }
+
+        
+        function initData(data) {
+            allData = data;
+            document.getElementById('loadingState').classList.add('hidden');
+            
+          
+            const lembagaSet = new Set();
+            const kelasSet = new Set();
+            data.forEach(item => {
+                if (item.lembaga) lembagaSet.add(item.lembaga);
+                if (item.kelas) kelasSet.add(item.kelas.toString());
+            });
+            const lembagaSelect = document.getElementById('filterLembaga');
+            lembagaSelect.innerHTML = '<option value="">Semua Lembaga</option>';
+            [...lembagaSet].sort().forEach(l => { lembagaSelect.add(new Option(l, l)); });
+            
+            const kelasSelect = document.getElementById('filterKelas');
+            kelasSelect.innerHTML = '<option value="">Semua Kelas</option>';
+            [...kelasSet].sort((a,b) => Number(a) - Number(b)).forEach(k => { kelasSelect.add(new Option(`Kelas ${k}`, k)); });
+            
+            currentPage = 1;
+            renderTable();
+            
+            // Event listeners
+            document.getElementById('searchName').addEventListener('input', () => { currentPage = 1; renderTable(); });
+            document.getElementById('filterLembaga').addEventListener('change', () => { currentPage = 1; renderTable(); });
+            document.getElementById('filterKelas').addEventListener('change', () => { currentPage = 1; renderTable(); });
+        }
+
+       
+        function renderTable() {
+            const search = document.getElementById('searchName').value.toLowerCase();
+            const filterL = document.getElementById('filterLembaga').value;
+            const filterK = document.getElementById('filterKelas').value;
+            
+            let filtered = allData.filter(item => {
+                const matchName = item.nama.toLowerCase().includes(search);
+                const matchLembaga = filterL === "" || item.lembaga === filterL;
+                const matchKelas = filterK === "" || item.kelas.toString() === filterK;
+                return matchName && matchLembaga && matchKelas;
+            });
+            
+            const tbody = document.getElementById('dataTable');
+            const emptyDiv = document.getElementById('emptyState');
+            const paginationDiv = document.getElementById('paginationContainer');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '';
+                emptyDiv.classList.remove('hidden');
+                emptyDiv.classList.add('flex');
+                paginationDiv.classList.add('hidden');
+                return;
+            }
+            emptyDiv.classList.add('hidden');
+            emptyDiv.classList.remove('flex');
+            
+            const totalPages = Math.ceil(filtered.length / ROWS_PER_PAGE);
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+            const start = (currentPage - 1) * ROWS_PER_PAGE;
+            const pageData = filtered.slice(start, start + ROWS_PER_PAGE);
+            
+            tbody.innerHTML = '';
+            pageData.forEach((item, idx) => {
+                const row = tbody.insertRow();
+                row.className = 'hover:bg-slate-50 transition-colors';
+                row.innerHTML = `
+                    <td class="px-6 py-4 text-center font-medium">${start + idx + 1}</td>
+                    <td class="px-6 py-4 font-bold text-slate-800">${escapeHtml(item.nama)}</td>
+                    <td class="px-6 py-4 text-center"><span class="bg-slate-100 text-slate-700 py-1 px-3 rounded-full text-xs font-bold">${escapeHtml(item.kelas)}</span></td>
+                    <td class="px-6 py-4 text-slate-600">${escapeHtml(item.lembaga)}</td>
+                    <td class="px-6 py-4 text-center">
+                        ${item.link && item.link !== '#' ? 
+                            `<a href="${escapeHtml(item.link)}" target="_blank" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-blue-600 text-white px-5 py-2.5 rounded-lg text-xs font-bold transition-all shadow-sm">Unduh</a>` : 
+                            `<span class="text-gray-400 text-xs">Tidak tersedia</span>`}
+                    </td>
+                `;
+            });
+            
+            if (totalPages > 1) {
+                renderPagination(totalPages, currentPage);
+                paginationDiv.classList.remove('hidden');
+            } else {
+                paginationDiv.classList.add('hidden');
+            }
+        }
+        
+    
+        function renderPagination(totalPages, activePage) {
+            const nav = document.querySelector('#paginationContainer nav');
+            nav.innerHTML = '';
+            
+            const createButton = (label, page, disabled = false, isActive = false) => {
+                const btn = document.createElement('button');
+                btn.className = `min-w-[38px] h-10 px-3 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-1
+                    ${isActive ? 'bg-blue-600 text-white shadow-md ring-1 ring-blue-500' :
+                      disabled ? 'bg-white text-slate-300 border border-slate-200 cursor-not-allowed opacity-50' :
+                      'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 hover:border-slate-300'}`;
+                btn.innerHTML = label;
+                if (!disabled && !isActive && typeof page === 'number') {
+                    btn.addEventListener('click', () => { currentPage = page; renderTable(); });
+                }
+                return btn;
+            };
+            
+           
+            const prevDisabled = activePage === 1;
+            nav.appendChild(createButton('<i class="fas fa-chevron-left text-xs"></i><span class="hidden sm:inline ml-1">Prev</span>', activePage - 1, prevDisabled));
+            
+            // Nomor halaman dengan ellipsis
+            let startPage = 1, endPage = totalPages;
+            const maxVisible = 5;
+            if (totalPages > maxVisible) {
+                const half = Math.floor(maxVisible / 2);
+                if (activePage <= half) { startPage = 1; endPage = maxVisible; }
+                else if (activePage + half >= totalPages) { startPage = totalPages - maxVisible + 1; endPage = totalPages; }
+                else { startPage = activePage - half; endPage = activePage + half; }
+            }
+            if (startPage > 1) {
+                nav.appendChild(createButton('1', 1));
+                if (startPage > 2) { const dots = document.createElement('span'); dots.className = 'text-slate-400 px-1'; dots.innerHTML = '...'; nav.appendChild(dots); }
+            }
+            for (let i = startPage; i <= endPage; i++) {
+                nav.appendChild(createButton(i.toString(), i, false, i === activePage));
+            }
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) { const dots = document.createElement('span'); dots.className = 'text-slate-400 px-1'; dots.innerHTML = '...'; nav.appendChild(dots); }
+                nav.appendChild(createButton(totalPages.toString(), totalPages));
+            }
+            // Next
+            const nextDisabled = activePage === totalPages;
+            nav.appendChild(createButton('<span class="hidden sm:inline mr-1">Next</span><i class="fas fa-chevron-right text-xs"></i>', activePage + 1, nextDisabled));
+        }
+        
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+        
+        function showError(msg) {
+            const loadingDiv = document.getElementById('loadingState');
+            loadingDiv.innerHTML = `<i class="fas fa-exclamation-triangle text-3xl text-red-500 mb-4"></i>
+                                    <p class="text-sm font-medium text-slate-600">Gagal memuat data.</p>
+                                    <p class="text-xs text-red-400 mt-1 max-w-md">${msg}</p>
+                                    <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">Coba Lagi</button>`;
+            document.getElementById('paginationContainer').classList.add('hidden');
+        }
+        
+        
+        fetchData();
+    </script>
+</body>
+</html>

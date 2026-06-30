@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id"> 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KORWIL SINE</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true" type="image/png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f1f5f9;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+
+        .app-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            height: 100%; /* Memastikan kartu mengisi tinggi grid */
+        }
+
+        .app-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 10px;
+        }
+
+        .clock-badge {
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay {
+            transition: opacity 0.3s ease-in-out;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-content {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .modal-hidden .modal-content {
+            transform: scale(0.9) translateY(20px);
+        }
+    </style>
+</head>
+<body class="text-slate-800 flex flex-col min-h-screen">
+
+    <header class="hero-gradient text-white pt-16 pb-32 px-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-12 opacity-10 pointer-events-none">
+            <i class="fa-solid fa-graduation-cap text-[200px]"></i>
+        </div>
+
+        <div class="max-w-5xl mx-auto flex flex-col items-center text-center relative z-10">
+            <img src="https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true" alt="Logo" class="w-24 h-24 mb-8 drop-shadow-2xl">
+            
+            <h1 class="text-4xl md:text-6xl font-extrabold mb-6 tracking-tight">KORWIL SINE</h1>
+            
+            <p class="text-slate-300 text-lg md:text-xl max-w-2xl font-light leading-relaxed">
+                Membangun pondasi bangsa dari tingkat dasar. Mari kita jadikan setiap sekolah di Kecamatan Sine sebagai rumah kedua yang menyenangkan untuk belajar.
+            </p>
+
+            <div class="mt-10 flex flex-col items-center">
+                <div class="clock-badge px-8 py-3 rounded-2xl flex flex-col md:flex-row items-center gap-2 md:gap-6 shadow-2xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span id="clock-time" class="text-2xl md:text-3xl font-bold tracking-wider text-white">00:00:00</span>
+                    </div>
+                    <div class="hidden md:block w-[1px] h-8 bg-white/20"></div>
+                    <div id="clock-date" class="text-sm md:text-base font-medium text-slate-300 tracking-wide">Memuat Tanggal...</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-5xl mx-auto px-6 -mt-16 pb-20 relative z-20">
+        
+        <!-- Grid container dengan items-stretch untuk tinggi yang seragam -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+
+            <!-- 1. Menu: Berita dan Informasi -->
+<a href="https://www.korwilsine.web.id/berita/index" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl group">
+    <div class="w-16 h-16 rounded-2xl bg-blue-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform shrink-0">
+        <i class="fa-solid fa-newspaper text-3xl"></i>
+    </div>
+    <div class="flex-grow">
+        <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">BERITA & INFORMASI</h2>
+        <p class="text-slate-500 text-sm leading-relaxed">
+            Klik di sini untuk mengakses portal berita, pengumuman, dan informasi terbaru seputar Korwil Bidang Pendidikan Kecamatan Sine.
+        </p>
+    </div>
+    <div class="mt-8 flex items-center justify-between">
+        <span class="px-4 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">Update</span>
+        <i class="fa-solid fa-circle-arrow-right text-blue-500 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+    </div>
+</a>
+            <!-- 1. Menu: ASAS -->
+            <a href="https://www.korwilsine.web.id/asas" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl group">
+                <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform shrink-0">
+                    <i class="fa-solid fa-clipboard-check text-3xl"></i>
+                </div>
+                <div class="flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-emerald-600 transition-colors">ASSESSMENT AKHIR</h2>
+                    <p class="text-slate-500 text-sm leading-relaxed">
+                        Klik di sini untuk mengakses portal utama pelaksanaan Assessment Akhir Semester (ASAS) Digital.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center justify-between">
+                    <span class="px-4 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">Aktif</span>
+                    <i class="fa-solid fa-circle-arrow-right text-emerald-500 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </div>
+            </a>
+
+            <!-- 2. Menu: Monitoring Presensi -->
+            <a href="https://yoriapp.site/e-presensi" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl group">
+                <div class="w-16 h-16 rounded-2xl bg-blue-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-blue-200 group-hover:scale-110 transition-transform shrink-0">
+                    <i class="fa-solid fa-fingerprint text-3xl"></i>
+                </div>
+                <div class="flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-blue-600 transition-colors">MONITORING PRESENSI</h2>
+                    <p class="text-slate-500 text-sm leading-relaxed">
+                        Klik di sini untuk mengakses portal E-Presensi dan pemantauan kehadiran secara real-time.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center justify-between">
+                    <span class="px-4 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full uppercase tracking-wider">Aktif</span>
+                    <i class="fa-solid fa-circle-arrow-right text-blue-500 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </div>
+            </a>
+
+            <!-- 3. Menu: Aplikasi Presensi (Updated) -->
+            <a href="https://korwilsine.web.id/unduhan" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl group">
+                <div class="w-16 h-16 rounded-2xl bg-violet-600 text-white flex items-center justify-center mb-6 shadow-lg shadow-violet-200 group-hover:scale-110 transition-transform shrink-0">
+                    <i class="fa-solid fa-download text-3xl"></i>
+                </div>
+                <div class="flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-violet-600 transition-colors uppercase">Aplikasi Presensi</h2>
+                    <p class="text-slate-500 text-sm leading-relaxed">
+                        Klik di sini untuk mengunduh aplikasi presensi resmi dan panduan penggunaan perangkat.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center justify-between">
+                    <span class="px-4 py-1 bg-violet-100 text-violet-700 text-xs font-bold rounded-full uppercase tracking-wider">Download</span>
+                    <i class="fa-solid fa-circle-arrow-right text-violet-600 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </div>
+            </a>
+
+            <!-- 4. Menu: Rapot Sisipan (New) -->
+           <a href="https://www.korwilsine.web.id/games" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl group">
+    <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform shrink-0">
+        <i class="fa-solid fa-gamepad text-3xl"></i>
+    </div>
+    <div class="flex-grow">
+        <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-emerald-600 transition-colors uppercase">Game Matematika IFP</h2>
+        <p class="text-slate-500 text-sm leading-relaxed">
+            Mainkan dan akses portal game edukasi matematika IFP interaktif u.
+        </p>
+    </div>
+    <div class="mt-8 flex items-center justify-between">
+        <span class="px-4 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">Aktif</span>
+        <i class="fa-solid fa-circle-arrow-right text-emerald-500 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+    </div>
+</a>
+
+            <a href="https://www.korwilsine.web.id/formtranskrip" class="app-card bg-white rounded-3xl p-8 border border-white shadow-xl group">
+                <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-6 shadow-lg shadow-emerald-200 group-hover:scale-110 transition-transform shrink-0">
+                    <i class="fa-solid fa-clipboard-check text-3xl"></i>
+                </div>
+                <div class="flex-grow">
+                    <h2 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-emerald-600 transition-colors">FORM TRANSKRIP</h2>
+                    <p class="text-slate-500 text-sm leading-relaxed">
+                        Klik di sini untuk mengakses Form Nilai Transkrip.
+                    </p>
+                </div>
+                <div class="mt-8 flex items-center justify-between">
+                    <span class="px-4 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full uppercase tracking-wider">Aktif</span>
+                    <i class="fa-solid fa-circle-arrow-right text-emerald-500 text-2xl opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                </div>
+            </a>
+            <!-- Placeholder Slots -->
+            <div class="bg-slate-200/50 rounded-3xl p-8 border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-center opacity-70 min-h-[300px]">
+                <div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-400 mb-4">
+                    <i class="fa-solid fa-lock text-xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-slate-400 uppercase tracking-widest text-sm">Mendatang</h3>
+            </div>
+
+           
+
+        </div>
+
+        <div class="mt-16 bg-white rounded-2xl p-6 shadow-sm border border-slate-200 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
+                    <i class="fa-solid fa-circle-info text-xl"></i>
+                </div>
+                <p class="text-sm text-slate-600 max-w-xl">
+                    Satu pintu menuju layanan pendidikan yang transparan, akuntabel, dan modern bagi seluruh masyarakat Kecamatan Sine.
+                </p>
+            </div>
+            <button onclick="toggleModal()" class="text-blue-600 font-semibold hover:text-blue-800 transition-colors text-sm flex items-center gap-2 focus:outline-none shrink-0">
+                Hubungi Admin <i class="fa-solid fa-chevron-right text-xs"></i>
+            </button>
+        </div>
+    </main>
+
+    <div id="contactModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 modal-overlay modal-hidden bg-slate-900/60">
+        <div class="bg-white w-full max-w-sm rounded-[2rem] shadow-2xl overflow-hidden modal-content relative">
+            <button onclick="toggleModal()" class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-all z-10">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+
+            <div class="p-8 pb-4 text-center">
+                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-headset text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-900">Hubungi Admin</h3>
+                <p class="text-slate-500 text-sm mt-1">Silakan pilih metode komunikasi</p>
+            </div>
+
+            <div class="p-6 pt-2 space-y-3">
+                <!-- Website -->
+                <a href="https://yoriapp.site" target="_blank" class="flex items-center p-4 bg-indigo-50 border border-indigo-100 rounded-2xl group hover:bg-indigo-600 hover:border-indigo-600 transition-all duration-300">
+                    <div class="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-indigo-600 transition-colors shadow-lg">
+                        <i class="fa-solid fa-globe text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="font-bold text-indigo-900 group-hover:text-white text-sm">Situs Resmi Admin</p>
+                        <p class="text-[10px] text-indigo-600 group-hover:text-indigo-100">www.yoriapp.site</p>
+                    </div>
+                </a>
+
+                <!-- WhatsApp -->
+                <a href="https://wa.me/6282232414008" target="_blank" class="flex items-center p-4 bg-emerald-50 border border-emerald-100 rounded-2xl group hover:bg-emerald-500 hover:border-emerald-500 transition-all duration-300">
+                    <div class="w-12 h-12 bg-emerald-500 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-emerald-500 transition-colors shadow-lg">
+                        <i class="fa-brands fa-whatsapp text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="font-bold text-emerald-900 group-hover:text-white text-sm">WhatsApp</p>
+                        <p class="text-[10px] text-emerald-600 group-hover:text-emerald-100">0822-3241-4008</p>
+                    </div>
+                </a>
+
+                <!-- Email -->
+                <a href="mailto:yoshiprakoso@gmail.com" class="flex items-center p-4 bg-blue-50 border border-blue-100 rounded-2xl group hover:bg-blue-600 hover:border-blue-600 transition-all duration-300">
+                    <div class="w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center group-hover:bg-white group-hover:text-blue-600 transition-colors shadow-lg">
+                        <i class="fa-solid fa-envelope text-2xl"></i>
+                    </div>
+                    <div class="ml-4">
+                        <p class="font-bold text-blue-900 group-hover:text-white text-sm">Email Official</p>
+                        <p class="text-[10px] text-blue-600 group-hover:text-blue-100">yoshiprakoso@gmail.com</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="w-full py-8 text-center mt-auto border-t border-slate-200">
+        <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-2">
+            &copy; <span id="year-display"></span> KORWIL SINE
+        </p>
+        <p class="text-slate-400 text-[10px]">Powered by YoriApp Technology</p>
+    </footer>
+
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const timeElement = document.getElementById('clock-time');
+            const dateElement = document.getElementById('clock-date');
+            const yearElement = document.getElementById('year-display');
+
+            if(timeElement) timeElement.textContent = now.toLocaleTimeString('id-ID', { hour12: false });
+            if(dateElement) dateElement.textContent = now.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            if(yearElement) yearElement.textContent = now.getFullYear();
+        }
+
+        function toggleModal() {
+            const modal = document.getElementById('contactModal');
+            modal.classList.toggle('modal-hidden');
+            document.body.style.overflow = modal.classList.contains('modal-hidden') ? '' : 'hidden';
+        }
+
+        window.onclick = (e) => { if (e.target.id === 'contactModal') toggleModal(); };
+        setInterval(updateDateTime, 1000);
+        window.onload = updateDateTime;
+    </script>
+
+</body>
+</html>

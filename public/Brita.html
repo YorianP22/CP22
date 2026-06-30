@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Informasi Korwil Sine</title>
+    <link rel="icon" href="https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Mengaktifkan fitur dark mode berbasis class di Tailwind CSS
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    
+    <!-- PDF.js CDN untuk merender PDF langsung ke Canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    
+    <style>
+        /* Mencegah interaksi pointer mengganggu overlay iframe */
+        .iframe-overlay { pointer-events: none; }
+        
+        /* Kustomisasi scrollbar modern yang adaptif terhadap mode gelap/siang */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+            border-radius: 4px;
+        }
+        html.dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #64748b; 
+        }
+
+        /* Transisi transisi warna yang smooth di seluruh elemen saat mengganti tema */
+        body, header, main, footer, div, button, input {
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] dark:bg-slate-950 font-sans text-gray-800 dark:text-slate-100 min-h-screen flex flex-col">
+
+    <header class="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 py-4 flex items-center shadow-sm sticky top-0 z-50">
+        <div class="flex items-center justify-between gap-4 max-w-[1600px] mx-auto w-full">
+            <!-- Logo & Title -->
+            <div class="flex items-center gap-4">
+                <!-- Logo Korwil Sine dari Github -->
+                <img src="https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true" alt="Logo Korwil Sine" class="w-12 h-12 object-contain" />
+                <div>
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">KORWILDIKBUD KEC. SINE</h1>
+                    <p class="text-sm text-gray-500 dark:text-slate-400 font-medium tracking-widest text-[10px] uppercase">Pusat Informasi</p>
+                </div>
+            </div>
+            
+            <!-- Tombol Switcher Mode Malam/Siang (Adaptif) -->
+            <button id="themeToggle" class="flex items-center gap-2 px-3.5 py-2 rounded-lg border border-gray-200 dark:border-slate-700 bg-gray-50 hover:bg-gray-100 dark:bg-slate-800 dark:hover:bg-slate-700/80 transition-all shadow-sm focus:outline-none">
+                <span id="themeIcon"></span>
+                <span id="themeText" class="text-xs font-bold text-gray-700 dark:text-slate-200 hidden sm:inline"></span>
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto w-full p-4 md:p-6 lg:p-8 flex flex-col lg:flex-row gap-6 flex-1">
+        
+        <!-- Left Column - List Berita -->
+        <div class="w-full lg:w-[400px] xl:w-[450px] flex-shrink-0 flex flex-col gap-4 relative">
+            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800/80 p-5 lg:sticky lg:top-[100px] max-h-[calc(100vh-120px)] flex flex-col">
+                <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-white flex-shrink-0">Daftar Berita</h2>
+                
+                <!-- Search Box -->
+                <div class="relative mb-5 flex-shrink-0">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Cari berita..."
+                        class="w-full pl-4 pr-10 py-2.5 bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all dark:text-white dark:placeholder-slate-400"
+                    />
+                    <!-- Search Icon -->
+                    <svg class="absolute right-3 top-3 text-gray-400 dark:text-slate-500 w-5 h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                </div>
+
+                <!-- List Items Container -->
+                <div id="listContainer" class="flex flex-col gap-3 overflow-y-auto custom-scrollbar flex-1 pr-2">
+                    <!-- Item berita akan di-render di sini oleh JavaScript -->
+                </div>
+
+                <!-- Pagination Controls Container -->
+                <div id="paginationContainer" class="flex items-center justify-center gap-1 mt-6 pt-4 border-t border-gray-100 dark:border-slate-850 flex-shrink-0">
+                    <!-- Paginasi halaman akan di-render di sini -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Detail Konten Berita -->
+        <div class="flex-1 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-100 dark:border-slate-800/80 p-6 md:p-8 lg:p-10 flex flex-col" id="detailContainer">
+            <!-- Detail konten akan di-render di sini oleh JavaScript -->
+        </div>
+
+    </main>
+
+    <footer class="bg-white dark:bg-slate-950 border-t border-gray-200 dark:border-slate-900 text-center py-8 text-sm text-gray-500 dark:text-slate-400 mt-auto">
+        <h5 class="font-bold text-gray-700 dark:text-slate-300 tracking-widest mb-2">ARSIP DIGITAL KORWIL SINE</h5>
+        <p>© 2026 KorwilDikbud Kecamatan Sine. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Set worker pustaka PDF.js ke CDN eksternal
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        // State global untuk penanganan interaksi dokumen PDF
+        let currentPdfDoc = null;
+        let currentPdfPageNum = 1;
+        let currentPdfScale = 1.2;
+        let currentPdfUrl = "";
+        let pdfRenderTask = null;
+
+        // Mengambil ID Google Drive dari URL
+        function getGoogleDriveId(url) {
+            const match = url.match(/\/d\/([a-zA-Z0-9-_]+)/);
+            return match ? match[1] : null;
+        }
+
+        // ==========================================
+        // AREA PENGISIAN DATA BERITA
+        // ==========================================
+        const initialNewsData = [
+          {
+            id: 1,
+            title: "Edaran Informasi Akademik",
+            url: "https://github.com/YorianP22/CP22/blob/5a8c34d71f0b59046cd836c3cdc435ea40ffca11/Berita/SURAT%20PEMBERITAHUAN%20ASAS%202.pdf",
+            date: "17 Mei 2026",
+            time: "07:13",
+            status: "Dipublikasikan",
+            authorName: "Admin Korwil Sine",
+            authorRole: "Penulis",
+            authorAvatarUrl: "",
+            thumbnailUrl: "https://github.com/YorianP22/CP22/blob/main/Logo.png?raw=true",
+            description: "Berikut adalah Surat Edaran mengenai pelaksanaan kegiatan sekolah di Kecamatan Sine."
+          },
+          {
+            id: 2,
+            title: "Pelaksanaan Jadwal Kegiatan",
+            url: "https://github.com/YorianP22/CP22/blob/5a8c34d71f0b59046cd836c3cdc435ea40ffca11/Berita/SURAT%20PEMBERITAHUAN%20ASAS%202.pdf",
+            date: "16 Mei 2026",
+            time: "09:30",
+            status: "Dipublikasikan",
+            authorName: "Admin Korwil Sine",
+            authorRole: "YoriaN",
+            authorAvatarUrl: "",
+            thumbnailUrl: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=500&q=80",
+            description: "Jadwal lengkap pelaksanaan kegiatan untuk seluruh sekolah di Kecamatan Sine."
+          }
+        ]; // Dihapus reverse() di sini karena pengurutan dinamis sudah ditangani oleh sistem di bawah berdasarkan ID (berita baru/bawah muncul paling atas)
+
+        // Mengurutkan data secara dinamis berdasarkan ID Descending (ID terbesar / berita paling bawah di daftar kode muncul paling atas)
+        let processedNewsData = [...initialNewsData].sort((a, b) => b.id - a.id);
+
+        // State variables utama
+        let searchQuery = "";
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let filteredData = [...processedNewsData];
+        let selectedItem = filteredData[0] || null;
+
+        // Mendapatkan referensi DOM Elements
+        const searchInput = document.getElementById('searchInput');
+        const listContainer = document.getElementById('listContainer');
+        const paginationContainer = document.getElementById('paginationContainer');
+        const detailContainer = document.getElementById('detailContainer');
+
+        const themeToggleBtn = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const themeText = document.getElementById('themeText');
+
+        // Mengatur default awal ke 'light' (siang)
+        let currentTheme = localStorage.getItem('theme') || 'light';
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                // Mengganti icon ke matahari (untuk beralih ke siang)
+                themeIcon.innerHTML = `
+                    <svg class="w-5 h-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="4"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+                    </svg>
+                `;
+                themeText.textContent = 'Mode Siang';
+            } else {
+                document.documentElement.classList.remove('dark');
+                // Mengganti icon ke bulan (untuk beralih ke malam)
+                themeIcon.innerHTML = `
+                    <svg class="w-5 h-5 text-slate-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                `;
+                themeText.textContent = 'Mode Malam';
+            }
+            localStorage.setItem('theme', theme);
+        }
+
+        // Jalankan inisialisasi tema
+        applyTheme(currentTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            applyTheme(currentTheme);
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value.toLowerCase();
+            currentPage = 1; 
+            updateState();
+        });
+
+        // Fungsi Global untuk memilih berita
+        window.selectItem = function(id) {
+            selectedItem = filteredData.find(item => item.id === id);
+            renderList();
+            renderDetail();
+            // Scroll otomatis ke atas jika diakses via mobile/tablet
+            if(window.innerWidth < 1024) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        // Fungsi Global untuk berganti halaman paginasi
+        window.paginate = function(page) {
+            currentPage = page;
+            renderList();
+            renderPagination();
+            // Scroll lembut ke atas daftar berita
+            document.querySelector('.lg\\:sticky').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        // Memperbarui state secara dinamis dan me-render ulang UI
+        function updateState() {
+            // Urutkan ulang data utama untuk memastikan data terbaru (ID terbesar atau index terbawah) selalu di atas
+            processedNewsData = [...initialNewsData].sort((a, b) => b.id - a.id);
+
+            filteredData = processedNewsData.filter(item => 
+                item.title.toLowerCase().includes(searchQuery)
+            );
+            
+            if (!filteredData.find(item => item.id === selectedItem?.id)) {
+                selectedItem = filteredData.length > 0 ? filteredData[0] : null;
+            }
+
+            renderList();
+            renderPagination();
+            renderDetail();
+        }
+
+        function renderList() {
+            const indexOfLastItem = currentPage * itemsPerPage;
+            const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+            const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
+            if (currentItems.length === 0) {
+                listContainer.innerHTML = `<div class="text-center py-10 text-gray-400 dark:text-slate-500 text-sm">Data tidak ditemukan.</div>`;
+                return;
+            }
+
+            let listHTML = '';
+            currentItems.forEach(item => {
+                const isSelected = selectedItem && selectedItem.id === item.id;
+                
+                // Kelas gaya adaptif untuk mode terang dan malam
+                const buttonClass = isSelected 
+                    ? 'bg-[#F0F7FF] border-blue-400 dark:bg-blue-950/40 dark:border-blue-500 shadow-sm relative' 
+                    : 'bg-white border-gray-100 hover:border-gray-300 hover:bg-gray-50 dark:bg-slate-900 dark:border-slate-800 dark:hover:border-slate-700 dark:hover:bg-slate-800/40';
+                
+                const titleClass = isSelected ? 'text-gray-900 dark:text-white' : 'text-gray-700 dark:text-slate-300';
+                const indicatorHTML = isSelected ? `<div class="w-2.5 h-2.5 rounded-full bg-blue-600 absolute right-4"></div>` : '';
+
+                listHTML += `
+                    <button onclick="selectItem(${item.id})" class="flex items-center gap-4 p-3 rounded-lg border transition-all text-left w-full ${buttonClass}">
+                        <!-- Container Thumbnail -->
+                        <div class="w-16 h-12 rounded bg-gray-100 dark:bg-slate-800/50 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                            <img src="${item.thumbnailUrl}" alt="thumb" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/100x100/eaeaea/333333?text=PDF'" />
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-semibold text-sm truncate ${titleClass}">${item.title}</h3>
+                            <p class="text-xs text-gray-500 dark:text-slate-400 mt-1">${item.date} • ${item.time}</p>
+                        </div>
+                        ${indicatorHTML}
+                    </button>
+                `;
+            });
+            listContainer.innerHTML = listHTML;
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            
+            if (totalPages <= 1) {
+                paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+
+            const prevDisabled = currentPage === 1 ? 'disabled opacity-50 cursor-not-allowed' : '';
+            paginationHTML += `
+                <button onclick="paginate(Math.max(1, ${currentPage - 1}))" ${prevDisabled} class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 dark:border-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const isActive = currentPage === i;
+                const pageClass = isActive 
+                    ? 'bg-blue-600 border-blue-600 text-white' 
+                    : 'border-gray-200 dark:border-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800';
+                
+                paginationHTML += `
+                    <button onclick="paginate(${i})" class="w-8 h-8 flex items-center justify-center rounded border text-sm font-medium ${pageClass}">
+                        ${i}
+                    </button>
+                `;
+            }
+
+            const nextDisabled = currentPage === totalPages ? 'disabled opacity-50 cursor-not-allowed' : '';
+            paginationHTML += `
+                <button onclick="paginate(Math.min(${totalPages}, ${currentPage + 1}))" ${nextDisabled} class="w-8 h-8 flex items-center justify-center rounded border border-gray-200 dark:border-slate-800 text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800">
+                    <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+            `;
+
+            paginationContainer.innerHTML = paginationHTML;
+        }
+
+        function renderDetail() {
+            if (!selectedItem) {
+                detailContainer.innerHTML = `
+                    <div class="flex-1 flex items-center justify-center text-gray-400 dark:text-slate-500 flex-col py-12">
+                        <svg class="w-16 h-16 mb-4 text-gray-200 dark:text-slate-800" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/></svg>
+                        <p>Pilih berita untuk menampilkan detail</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const pdfViewerContent = `
+                <div class="w-full flex flex-col rounded-xl overflow-hidden border border-gray-200 dark:border-slate-800 shadow-sm bg-gray-50 dark:bg-slate-950">
+                    
+                    <!-- Area Render Dokumen -->
+                    <div class="relative w-full h-[800px] overflow-auto bg-gray-100 dark:bg-slate-950 flex justify-center items-start p-4 custom-scrollbar" id="pdfCanvasContainer">
+                        
+                        <!-- Indikator Memuat Dokumen -->
+                        <div id="pdfLoadingIndicator" class="absolute inset-0 flex flex-col items-center justify-center bg-white/95 dark:bg-slate-900/95 z-20 transition-opacity duration-300">
+                            <svg class="animate-spin h-9 w-9 text-blue-600 mb-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p class="text-sm font-semibold text-gray-700 dark:text-slate-300">Merender Dokumen Presisi...</p>
+                        </div>
+
+                        <!-- Fallback / Error Handling Khusus Pembatasan CORS Keamanan Google Drive -->
+                        <div id="pdfErrorAlert" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-white dark:bg-slate-900 p-6 text-center z-20">
+                            <div class="p-4 bg-amber-50 dark:bg-amber-950/20 rounded-2xl border border-amber-200 dark:border-amber-900/40 max-w-md shadow-inner flex flex-col items-center">
+                                <svg class="w-14 h-14 text-amber-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                <h3 class="font-bold text-lg mb-2 text-gray-900 dark:text-white">Prosedur Keamanan Google</h3>
+                                <p class="text-xs text-gray-600 dark:text-slate-400 leading-relaxed mb-5">Kebijakan pembatasan browser (CORS) mencegah pembacaan langsung di kanvas. Anda dapat membuka arsip dengan aman menggunakan tautan enkripsi langsung di bawah ini:</p>
+                                <div class="flex flex-wrap justify-center gap-3">
+                                    <button onclick="openPdfDirect()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold shadow transition flex items-center gap-2 text-xs">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        Buka Dokumen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kanvas Tempat Menggambar Piksel Dokumen -->
+                        <canvas id="pdfRenderCanvas" class="shadow-2xl border border-gray-200 dark:border-slate-800 rounded bg-white transition-all duration-300"></canvas>
+                    </div>
+
+                    <!-- Toolbar Bawah: Hanya Navigasi Halaman -->
+                    <div class="flex items-center justify-center gap-4 p-3.5 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800">
+                        <button onclick="changePdfPage(-1)" id="prevPageBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed transition" title="Halaman Sebelumnya">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <span class="text-xs sm:text-sm font-semibold text-gray-700 dark:text-slate-300">
+                            Halaman <span id="pdfCurrentPage" class="font-bold text-blue-600 dark:text-blue-400">1</span> dari <span id="pdfTotalPages">1</span>
+                        </span>
+                        <button onclick="changePdfPage(1)" id="nextPageBtn" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-slate-400 disabled:opacity-40 disabled:cursor-not-allowed transition" title="Halaman Selanjutnya">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            const avatarHTML = selectedItem.authorAvatarUrl 
+                ? `<img src="${selectedItem.authorAvatarUrl}" alt="${selectedItem.authorName}" class="w-full h-full object-cover" />`
+                : `<svg class="w-6 h-6 text-gray-400 dark:text-slate-500" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+
+            detailContainer.innerHTML = `
+                <!-- Meta Top -->
+                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-gray-100 dark:border-slate-850 pb-4 mb-6">
+                    <div class="flex items-center gap-2 text-sm text-gray-500 dark:text-slate-400">
+                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+                        <span>${selectedItem.date} • ${selectedItem.time}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 px-3 py-1 bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400 rounded-full text-xs font-medium border border-green-200 dark:border-green-900/50">
+                        <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                        ${selectedItem.status}
+                    </div>
+                </div>
+
+                <!-- Title -->
+                <h1 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
+                    ${selectedItem.title}
+                </h1>
+
+                <!-- Description -->
+                ${selectedItem.description ? `
+                <div class="text-gray-600 dark:text-slate-300 mb-6 leading-relaxed text-lg">
+                    <p>${selectedItem.description}</p>
+                </div>
+                ` : ''}
+
+                <!-- Container Canvas Baru (Tanpa Iframe) -->
+                <div class="w-full mb-8">
+                    ${pdfViewerContent}
+                </div>
+
+                <!-- Author Info -->
+                <div class="mt-auto pt-6 border-t border-gray-100 dark:border-slate-850 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 flex items-center justify-center overflow-hidden">
+                        ${avatarHTML}
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 dark:text-white text-sm">${selectedItem.authorName}</h4>
+                        <p class="text-xs text-gray-500 dark:text-slate-400">${selectedItem.authorRole}</p>
+                    </div>
+                </div>
+            `;
+
+            // Memicu inisialisasi pemuatan dokumen PDF menggunakan PDF.js secara asinkronus
+            loadPdfDocument(selectedItem.url);
+        }
+
+        // Mengunduh berkas PDF dan merender lewat PDF.js
+        async function loadPdfDocument(url) {
+            currentPdfUrl = url;
+            const loadingIndicator = document.getElementById('pdfLoadingIndicator');
+            const errorAlert = document.getElementById('pdfErrorAlert');
+            const canvas = document.getElementById('pdfRenderCanvas');
+            
+            loadingIndicator.classList.remove('hidden');
+            errorAlert.classList.add('hidden');
+            canvas.classList.add('hidden');
+            
+            if (pdfRenderTask) {
+                pdfRenderTask.cancel();
+            }
+            
+            let pdfDataUrl = url;
+
+            // Optimasi Tambahan: Konversi tautan blob halaman github ke direct raw content link
+            if (pdfDataUrl.includes('github.com') && pdfDataUrl.includes('/blob/')) {
+                pdfDataUrl = pdfDataUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+            }
+            
+            const driveId = getGoogleDriveId(url);
+            
+            if (driveId) {
+                // Konversi URL Google Drive ke direct file download endpoint
+                const directUrl = `https://docs.google.com/uc?export=download&id=${driveId}`;
+                // Menggunakan allorigins proxy CORS gratis untuk memotong pemblokiran header browser
+                pdfDataUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(directUrl)}`;
+            }
+            
+            try {
+                const loadingTask = window.pdfjsLib.getDocument({
+                    url: pdfDataUrl,
+                    withCredentials: false
+                });
+                
+                currentPdfDoc = await loadingTask.promise;
+                currentPdfPageNum = 1;
+                
+                document.getElementById('pdfTotalPages').textContent = currentPdfDoc.numPages;
+                loadingIndicator.classList.add('hidden');
+                canvas.classList.remove('hidden');
+                
+                await renderPdfPage(currentPdfPageNum);
+            } catch (err) {
+                console.error('Pemuatan PDF di Canvas gagal, beralih ke fallback UI:', err);
+                loadingIndicator.classList.add('hidden');
+                errorAlert.classList.remove('hidden');
+            }
+        }
+
+        // Merender halaman PDF spesifik ke Canvas HTML5
+        async function renderPdfPage(pageNum) {
+            if (!currentPdfDoc) return;
+            
+            const canvas = document.getElementById('pdfRenderCanvas');
+            const context = canvas.getContext('2d');
+            
+            try {
+                const page = await currentPdfDoc.getPage(pageNum);
+                const viewport = page.getViewport({ scale: currentPdfScale });
+                
+                // Melipatgandakan resolusi internal berdasarkan pixel ratio monitor untuk hasil yang jernih (tidak buram)
+                const pixelRatio = window.devicePixelRatio || 1;
+                canvas.width = viewport.width * pixelRatio;
+                canvas.height = viewport.height * pixelRatio;
+                canvas.style.width = `${viewport.width}px`;
+                canvas.style.height = `${viewport.height}px`;
+                
+                context.scale(pixelRatio, pixelRatio);
+                
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                
+                if (pdfRenderTask) {
+                    pdfRenderTask.cancel();
+                }
+                
+                pdfRenderTask = page.render(renderContext);
+                await pdfRenderTask.promise;
+                
+                document.getElementById('pdfCurrentPage').textContent = pageNum;
+                document.getElementById('prevPageBtn').disabled = (pageNum <= 1);
+                document.getElementById('nextPageBtn').disabled = (pageNum >= currentPdfDoc.numPages);
+                
+                // Keamanan penanganan variabel zoom jika sewaktu-waktu diaktifkan kembali
+                const zoomPercentEl = document.getElementById('zoomPercent');
+                if (zoomPercentEl) {
+                    zoomPercentEl.textContent = `${Math.round(currentPdfScale * 100)}%`;
+                }
+            } catch (err) {
+                if (err.name !== 'RenderingCancelledException') {
+                    console.error('Error saat merender halaman:', err);
+                }
+            }
+        }
+
+        // Handler perubahan halaman navigasi
+        window.changePdfPage = function(offset) {
+            const newPageNum = currentPdfPageNum + offset;
+            if (newPageNum >= 1 && newPageNum <= (currentPdfDoc ? currentPdfDoc.numPages : 1)) {
+                currentPdfPageNum = newPageNum;
+                renderPdfPage(currentPdfPageNum);
+            }
+        };
+
+        // Handler pembesaran/pengecilan zoom dokumen
+        window.zoomPdf = function(factor) {
+            currentPdfScale = Math.min(Math.max(currentPdfScale + factor, 0.6), 2.5);
+            renderPdfPage(currentPdfPageNum);
+        };
+
+        // Handler mengembalikan rasio asli zoom dokumen
+        window.resetPdfZoom = function() {
+            currentPdfScale = 1.2;
+            renderPdfPage(currentPdfPageNum);
+        };
+
+        // Membuka file secara eksternal jika render canvas dilarang oleh browser
+        window.openPdfDirect = function() {
+            if (currentPdfUrl) {
+                let directUrl = currentPdfUrl;
+                if (directUrl.includes('github.com') && directUrl.includes('/blob/')) {
+                    directUrl = directUrl.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+                }
+                window.open(directUrl, '_blank');
+            }
+        };
+
+        // Inisialisasi awal aplikasi
+        updateState();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Cetak Transkrip Nilai 2026</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { padding: 30px; background-color: #f8f9fa; }
+    .card { box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-radius: 10px; }
+    .loader { display: none; }
+    #panelUtama { display: none; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div id="panelAuth" class="row justify-content-center my-5">
+    <div class="col-md-5">
+      <div class="card p-4 bg-white border-primary text-center">
+        <h3 class="text-primary mb-3">🔑 Otentikasi Petugas</h3>
+        <p class="text-muted small">Masukkan Token untuk mengakses aplikasi ini.</p>
+        
+        <div class="mb-3">
+          <input type="password" id="inputToken" class="form-control text-center form-control-lg" placeholder="Masukkan Token Akses..." autocomplete="off">
+        </div>
+        
+        <button id="btnVerifikasi" class="btn btn-primary w-100 btn-lg" onclick="verifikasiTokenPetugas()">Masuk ke Sistem</button>
+        
+        <div id="authAlert" class="mt-3 text-danger fw-bold small" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="panelUtama">
+    <div class="card p-4 bg-white">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary m-0">🖨️ Panel Generate Transkrip Nilai 2026</h2>
+        <span class="badge bg-success p-2">🔓 Sesi Petugas Aktif</span>
+      </div>
+      <p class="text-muted">Aplikasi memuat antrean siswa yang belum dilakukan <strong>cetak/generate transkrip (🖨️PDF)</strong>.</p>
+      
+      <div class="d-flex gap-2 mb-4">
+        <a href="https://www.korwilsine.web.id/formtranskrip" target="_blank" class="btn btn-success">📝 Input Data</a>
+        <button class="btn btn-success" onclick="loadSiswa()">🔄 Refresh / Muat Data Antrean</button>
+        <button id="btnGenerateSemua" class="btn btn-danger" onclick="generateSemua()" disabled>🚀 Jalankan Generate Massal</button>
+      </div>
+
+      <div id="loadingStatus" class="loader text-center my-3">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p class="mt-2 text-secondary" id="loadingText">Sedang mengambil data...</p>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+          <thead class="table-dark">
+            <tr>
+              <th>No. Antrean</th>
+              <th>NISN</th>
+              <th>Nama Siswa</th>
+              <th>Asal Sekolah</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="tabelSiswa">
+            <tr>
+              <td colspan="5" class="text-center text-muted">Silakan klik "Refresh / Muat Data Antrean" untuk memuat data.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4 p-3 bg-light border rounded" style="max-height: 150px; overflow-y: auto;">
+        <small class="text-monospace text-secondary" id="consoleLog">> Sistem Siap...</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // PENTING: Ganti dengan URL Web App Google Apps Script Anda setelah di-publish/deploy
+  const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxrUywrThWHzqBecb7BcFef2kgjZPx1VIBG3hDGbwfoLb-9vBMw6Ehea3XmZ2XWOWikCg/exec";
+
+  let antreanSiswa = [];
+  let tokenPetugasSah = "";
+
+  // Helper fungsi untuk melakukan fetch data ke GAS API tanpa memicu CORS Preflight
+  async function panggilApi(payload) {
+    const response = await fetch(GAS_API_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    if (!response.ok) throw new Error("Gagal menghubungi server backend.");
+    return await response.json();
+  }
+
+  async function verifikasiTokenPetugas() {
+    const inputToken = document.getElementById("inputToken").value.trim();
+    const authAlert = document.getElementById("authAlert");
+    const btnVerifikasi = document.getElementById("btnVerifikasi");
+    
+    if (inputToken === "") {
+      authAlert.innerText = "⚠️ Token tidak boleh kosong!";
+      authAlert.style.display = "block";
+      return;
+    }
+    
+    btnVerifikasi.disabled = true;
+    btnVerifikasi.innerText = "Memverifikasi...";
+    authAlert.style.display = "none";
+    
+    try {
+      const result = await panggilApi({ action: "cekToken", token: inputToken });
+      
+      if (result.success && result.isValid) {
+        tokenPetugasSah = inputToken;
+        document.getElementById("panelAuth").style.display = "none";
+        document.getElementById("panelUtama").style.display = "block";
+        writeLog("Otentikasi Berhasil...");
+        loadSiswa();
+      } else {
+        btnVerifikasi.disabled = false;
+        btnVerifikasi.innerText = "Masuk ke Sistem";
+        authAlert.innerText = "❌ Token Salah atau Tidak Terdaftar! Akses Ditolak.";
+        authAlert.style.display = "block";
+        document.getElementById("inputToken").value = "";
+      }
+    } catch (err) {
+      btnVerifikasi.disabled = false;
+      btnVerifikasi.innerText = "Masuk ke Sistem";
+      authAlert.innerText = "Error: " + err.message;
+      authAlert.style.display = "block";
+    }
+  }
+
+  async function loadSiswa() {
+    document.getElementById("loadingStatus").style.display = "block";
+    document.getElementById("loadingText").innerText = "Menghubungi database Google Sheet...";
+    
+    try {
+      const result = await panggilApi({ action: "getSiswa", token: tokenPetugasSah });
+      document.getElementById("loadingStatus").style.display = "none";
+      
+      if (!result.success) throw new Error(result.message);
+      
+      antreanSiswa = result.data;
+      let html = "";
+      
+      if (antreanSiswa.length === 0) {
+        html = `<tr><td colspan="5" class="text-center text-success">🎉 Semua antrean bersih! Tidak ada siswa yang perlu di-generate.</td></tr>`;
+        document.getElementById("btnGenerateSemua").disabled = true;
+      } else {
+        antreanSiswa.forEach(function(siswa) {
+          html += `<tr id="row-${siswa.rowNum}">
+            <td>${siswa.rowNum}</td>
+            <td>${siswa.nisn}</td>
+            <td><strong>${siswa.nama}</strong></td>
+            <td>${siswa.sekolah}</td>
+            <td id="action-${siswa.rowNum}">
+              <button class="btn btn-sm btn-outline-primary" onclick="generatePerSiswa(${siswa.rowNum})">Generate</button>
+            </td>
+          </tr>`;
+        });
+        document.getElementById("btnGenerateSemua").disabled = false;
+      }
+      document.getElementById("tabelSiswa").innerHTML = html;
+      writeLog("Berhasil memuat " + antreanSiswa.length + " data siswa ke antrean.");
+    } catch (err) {
+      document.getElementById("loadingStatus").style.display = "none";
+      writeLog("Error memuat data: " + err.message);
+      alert("Gagal memuat antrean: " + err.message);
+    }
+  }
+
+  async function generatePerSiswa(rowNum) {
+    const actionCell = document.getElementById("action-" + rowNum);
+    actionCell.innerHTML = `<span class="spinner-border spinner-border-sm text-primary"></span> Memproses...`;
+    
+    try {
+      const result = await panggilApi({ action: "generateSiswa", rowNum: rowNum, token: tokenPetugasSah });
+      
+      if (result.success) {
+        actionCell.innerHTML = `<span class="badge bg-success">Selesai Berhasil ✅</span>`;
+        writeLog("Sukses generate dokumen untuk: " + result.nama);
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (err) {
+      actionCell.innerHTML = `<button class="btn btn-sm btn-outline-primary" onclick="generatePerSiswa(${rowNum})">Generate</button>`;
+      writeLog("Error baris " + rowNum + ": " + err.message);
+      alert("Gagal eksekusi: " + err.message);
+    }
+  }
+
+  async function generateSemua() {
+    if (antreanSiswa.length === 0) return;
+    document.getElementById("btnGenerateSemua").disabled = true;
+    writeLog("Memulai pemrosesan massal secara sekuensial...");
+    
+    document.getElementById("loadingStatus").style.display = "block";
+    
+    for (let index = 0; index < antreanSiswa.length; index++) {
+      let siswa = antreanSiswa[index];
+      document.getElementById("loadingText").innerText = `Batch memproses (${index + 1}/${antreanSiswa.length}): ${siswa.nama}`;
+      
+      const actionCell = document.getElementById("action-" + siswa.rowNum);
+      actionCell.innerHTML = `<span class="spinner-border spinner-border-sm text-danger"></span> Batching...`;
+      
+      try {
+        const result = await panggilApi({ action: "generateSiswa", rowNum: siswa.rowNum, token: tokenPetugasSah });
+        if (result.success) {
+          actionCell.innerHTML = `<span class="badge bg-success">Selesai Berhasil ✅</span>`;
+          writeLog("Batch sukses: " + result.nama);
+        } else {
+          throw new Error(result.message);
+        }
+      } catch (err) {
+        actionCell.innerHTML = `<span class="text-danger">Gagal ❌</span>`;
+        writeLog(`Batch Gagal di ${siswa.nama}: ` + err.message);
+      }
+    }
+    
+    writeLog("Semua antrean batch selesai diproses!");
+    document.getElementById("loadingStatus").style.display = "none";
+    alert("Batch massal selesai!");
+    loadSiswa();
+  }
+
+  function writeLog(txt) {
+    const logBox = document.getElementById("consoleLog");
+    logBox.innerHTML += "<br>> " + txt;
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+</script>
+
+</body>
+</html>
