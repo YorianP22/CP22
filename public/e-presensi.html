@@ -2221,7 +2221,197 @@ const createExportFns = ({ presensiData, ijinData, pegawaiData, flLem, dStart, d
       doc.save(`Rekap_Keterlambatan_${(flLem||'Semua').replace(/\s/g,'_')}_${n.toISOString().slice(0,10)}.pdf`);
     }catch(err){console.error(err);Swal.fire('Error','Terjadi kesalahan saat membuat PDF: '+err.message,'error');}
   };
-  return { exportDaftarHadirRingkas, generateLaporanPDF, exportRekapitulasiPDF, exportRekapKeterlambatan };
+
+  // ★ Rekap Pegawai Tidak Hadir — hanya menampilkan tanggal2 dimana pegawai TIDAK HADIR
+  // (mirip format Rekap Keterlambatan, tapi detail per-tanggal, bukan akumulasi).
+  const exportRekapTidakHadir = () => {
+    try{
+      const {jsPDF}=window.jspdf;
+      const tls=flLem?[flLem]:[...lembagaList];
+      const bulan=(dStart&&dEnd)?`${parseIjinDate(dStart)} s.d. ${parseIjinDate(dEnd)}`:(dStart?`Sejak ${parseIjinDate(dStart)}`:(dEnd?`S.d. ${parseIjinDate(dEnd)}`:'Semua Periode'));
+      const tglCetak=new Date().toLocaleString('id-ID');
+      const appIjin=(ijinData||[]).filter(ij=>ij.Status&&ij.Status.toLowerCase()==='disetujui');
+
+      const rekapGpMap=new Map();
+      getFiltered(null).forEach(p=>{
+        const dt=parsePresensiDate(p['Waktu']); if(!dt) return;
+        const nn=normalizeName(p['Nama Pegawai']||''), key=`${nn}|${dt}`;
+        if(!rekapGpMap.has(key)) rekapGpMap.set(key,{datang:null,pulang:null});
+        const ent=rekapGpMap.get(key), j=(p['Jenis Presensi']||'').toLowerCase(),
+          rad=p.displayRadius||p['Keterangan Radius']||'',
+          lib=rad.toLowerCase().includes('libur')||rad.toLowerCase().includes('cuti bersama'),
+          rec={time:exTime(p['Waktu']),radius:rad,isLibur:lib};
+        if(j==='datang') ent.datang=rec; else if(j==='pulang') ent.pulang=rec;
+      });
+
+      const rekapWorkDates=[];
+      if(dStart&&dEnd){
+        let cur=new Date(dStart); const eD=new Date(dEnd);
+        while(cur<=eD){
+          const dw=cur.getDay();
+          if(dw!==0&&dw!==6){
+            const dd=String(cur.getDate()).padStart(2,'0'),mm=String(cur.getMonth()+1).padStart(2,'0'),yy=cur.getFullYear();
+            rekapWorkDates.push(`${dd}/${mm}/${yy}`);
+          }
+          cur.setDate(cur.getDate()+1);
+        }
+      }
+      const isTHrek=r=>!r||(r.radius&&isTidakHadir(r.radius));
+
+      const jenisLabel=jn=>{
+        if(jn==='alpa') return {t:'ALPA (Tanpa Keterangan)',bg:[252,165,165],tc:[153,27,27]};
+        if(jn==='sakitDgSurat') return {t:'Sakit (Dgn Surat)',bg:[220,252,231],tc:[21,128,61]};
+        if(jn==='sakitTanpaSurat') return {t:'Sakit (Tanpa Surat)',bg:[255,237,213],tc:[180,60,10]};
+        if(jn==='ijinRes') return {t:'Ijin Resmi',bg:[219,234,254],tc:[29,78,216]};
+        if(jn==='dinasLuar') return {t:'Dinas Luar',bg:[243,232,255],tc:[109,40,217]};
+        if(jn==='cutiRes') return {t:'Cuti',bg:[241,245,249],tc:[71,85,105]};
+        return {t:'-',bg:[255,255,255],tc:[0,0,0]};
+      };
+
+      const classifyOne=(nm,dt)=>{
+        const nn=normalizeName(nm);
+        const match=appIjin.find(ij=>{
+          if(normalizeName(ij['Nama Pegawai']||'')!==nn) return false;
+          const s=parseIjinDate(ij['Tanggal Awal']),e=parseIjinDate(ij['Tanggal Berakir']);
+          if(!s||!e) return false;
+          return isDateInRange(dt,s,e);
+        });
+        if(!match) return {jn:'alpa',ket:'-'};
+        const jenis=(match['Jenis Ijin']||'').toLowerCase();
+        if(jenis.includes('sakit')&&(jenis.includes('surat')||jenis.includes('dokter'))) return {jn:'sakitDgSurat',ket:match['Keterangan']||'-'};
+        if(jenis.includes('sakit')) return {jn:'sakitTanpaSurat',ket:match['Keterangan']||'-'};
+        if(jenis.includes('dinas luar')||jenis.includes('tugas')) return {jn:'dinasLuar',ket:match['Keterangan']||'-'};
+        if(jenis.includes('cuti')) return {jn:'cutiRes',ket:match['Keterangan']||'-'};
+        return {jn:'ijinRes',ket:match['Keterangan']||'-'};
+      };
+
+      const lemaData=[];
+      for(const lem of tls){
+        const emps=getEmps(lem); if(!emps.length) continue;
+        const fd=getFiltered(lem);
+        const datangRows=fd.filter(x=>(x['Jenis Presensi']||'').toLowerCase()==='datang');
+        const entries=[];
+        emps.forEach(e=>{
+          const nm=e['Name Pegawai']||'', nip=e['Username (MP/ID)']||'-';
+          const nn=normalizeName(nm);
+          let thDates;
+          if(rekapWorkDates.length>0){
+            thDates=rekapWorkDates.filter(dtx=>{
+              if(pswActive(nm,dtx)) return false;
+              const ent=rekapGpMap.get(`${nn}|${dtx}`);
+              if(ent&&((ent.datang&&ent.datang.isLibur)||(ent.pulang&&ent.pulang.isLibur))) return false;
+              return isTHrek(ent?ent.datang:null);
+            });
+          } else {
+            const myDatang=datangRows.filter(x=>normalizeName(x['Nama Pegawai']||'')===nn);
+            thDates=myDatang.filter(x=>isTidakHadir(x.displayRadius||x['Keterangan Radius'])).map(x=>parsePresensiDate(x['Waktu'])).filter(Boolean);
+          }
+          thDates.sort((a,b)=>{
+            const [d1,m1,y1]=a.split('/'), [d2,m2,y2]=b.split('/');
+            return new Date(`${y1}-${m1}-${d1}`)-new Date(`${y2}-${m2}-${d2}`);
+          });
+          thDates.forEach(dt=>{
+            const cls=classifyOne(nm,dt);
+            entries.push({nm,nip,dt,...cls});
+          });
+        });
+        if(!entries.length) continue;
+        const sum={alpa:0,sakitDgSurat:0,sakitTanpaSurat:0,ijinRes:0,dinasLuar:0,cutiRes:0};
+        entries.forEach(en=>sum[en.jn]++);
+        lemaData.push({lem,entries,sum,pegawaiCount:new Set(entries.map(en=>en.nip+en.nm)).size});
+      }
+      if(!lemaData.length){Swal.fire('Data Kosong','Tidak ada data pegawai tidak hadir pada rentang ini.','info');return;}
+
+      const doc=new jsPDF('l','mm','a4');
+      const PW=doc.internal.pageSize.getWidth(), PH=doc.internal.pageSize.getHeight();
+      const drawPN=d=>{doc.setFontSize(7);doc.setTextColor(130);doc.text(`Hal ${d.pageNumber}`,PW-14,PH-5,{align:'right'});};
+      const drawHdr=(ttl,s1,s2)=>{
+        doc.setFillColor(127,29,29); doc.rect(0,0,PW,30,'F');
+        doc.setFillColor(153,27,27); doc.rect(0,24,PW,6,'F');
+        doc.setTextColor(255,255,255);
+        doc.setFont(undefined,'bold'); doc.setFontSize(13);
+        doc.text(ttl,PW/2,10,{align:'center'});
+        doc.setFont(undefined,'normal'); doc.setFontSize(7.5);
+        doc.text(s1,PW/2,17,{align:'center'});
+        doc.text(s2,PW/2,23,{align:'center'});
+      };
+      const drawFooter=y=>{
+        if(y>PH-14) return;
+        const k=[
+          {c:[252,165,165],t:'Alpa'},{c:[255,237,213],t:'Sakit Tanpa Surat'},{c:[220,252,231],t:'Sakit Dgn Surat'},
+          {c:[219,234,254],t:'Ijin Resmi'},{c:[243,232,255],t:'Dinas Luar'},{c:[241,245,249],t:'Cuti'},
+        ];
+        doc.setFontSize(5.8); doc.setFont(undefined,'bold'); doc.setTextColor(50);
+        let xi=14;
+        doc.text('Keterangan:',xi,y+2.5); xi+=16;
+        doc.setFont(undefined,'normal');
+        k.forEach(it=>{doc.setFillColor(...it.c);doc.roundedRect(xi,y,2.5,2.5,0.4,0.4,'F');doc.text(it.t,xi+3.5,y+2.5);xi+=it.t.length*2.1+6;});
+        doc.setFontSize(5.5); doc.setTextColor(130);
+        doc.text('Dasar: PP No.94/2021 tentang Disiplin PNS | UU ASN No.5/2014',14,y+7);
+      };
+
+      let firstPage=true;
+      for(const ld of lemaData){
+        if(!firstPage) doc.addPage('a4','l');
+        firstPage=false;
+        drawHdr(
+          'REKAP PEGAWAI TIDAK HADIR',
+          `Unit Kerja: ${ld.lem}   |   Periode: ${bulan}`,
+          `Dicetak: ${tglCetak}`
+        );
+        const stats=[
+          {l:'Pegawai\nTdk Hadir',v:ld.pegawaiCount,c:[254,202,202],tc:[185,28,28]},
+          {l:'Total\nHari TH',v:ld.entries.length,c:[254,202,202],tc:[185,28,28]},
+          {l:'Alpa',v:ld.sum.alpa,c:[252,165,165],tc:[153,27,27]},
+          {l:'Sakit\nTanpa Surat',v:ld.sum.sakitTanpaSurat,c:[255,237,213],tc:[180,60,10]},
+          {l:'Sakit\nDgn Surat',v:ld.sum.sakitDgSurat,c:[220,252,231],tc:[21,128,61]},
+          {l:'Ijin\nResmi',v:ld.sum.ijinRes,c:[219,234,254],tc:[29,78,216]},
+          {l:'Dinas\nLuar',v:ld.sum.dinasLuar,c:[243,232,255],tc:[109,40,217]},
+          {l:'Cuti',v:ld.sum.cutiRes,c:[241,245,249],tc:[71,85,105]},
+        ];
+        const bw=(PW-28)/stats.length, bh=18, by=32;
+        stats.forEach((st,i)=>{
+          const bx=14+i*(bw+1);
+          doc.setFillColor(...st.c); doc.roundedRect(bx,by,bw,bh,1.5,1.5,'F');
+          doc.setTextColor(...st.tc); doc.setFont(undefined,'bold'); doc.setFontSize(9);
+          doc.text(String(st.v),bx+bw/2,by+8,{align:'center'});
+          doc.setFont(undefined,'normal'); doc.setFontSize(5); doc.setTextColor(70,70,70);
+          st.l.split('\n').forEach((ln,li)=>doc.text(ln,bx+bw/2,by+12+(li*2.8),{align:'center'}));
+        });
+
+        doc.setTextColor(30,41,59); doc.setFont(undefined,'bold'); doc.setFontSize(7.5);
+        doc.text('DETAIL TANGGAL TIDAK HADIR PER PEGAWAI — urut nama & tanggal',14,54);
+
+        const body=ld.entries.map((en,i)=>{
+          const lb=jenisLabel(en.jn);
+          const [dd,mm,yy]=en.dt.split('/');
+          const hari=new Date(`${yy}-${mm}-${dd}`).toLocaleDateString('id-ID',{weekday:'long'});
+          return[
+            i+1, en.nm, en.nip, `${en.dt}`, hari,
+            {content:lb.t,styles:{fillColor:lb.bg,textColor:lb.tc,fontStyle:'bold'}},
+            en.ket||'-',
+          ];
+        });
+
+        doc.autoTable({
+          startY:56,
+          head:[['No','Nama Pegawai','NIP / ID','Tanggal','Hari','Jenis Ketidakhadiran','Keterangan']],
+          body,
+          theme:'grid',
+          headStyles:{fillColor:[153,27,27],textColor:255,fontStyle:'bold',fontSize:7,halign:'center',valign:'middle'},
+          bodyStyles:{fontSize:6.8,valign:'middle'},
+          columnStyles:{0:{cellWidth:8,halign:'center'},1:{cellWidth:42},2:{cellWidth:26},3:{cellWidth:22,halign:'center'},4:{cellWidth:22,halign:'center'},5:{cellWidth:38,halign:'center'},6:{cellWidth:'auto'}},
+          didDrawPage:drawPN,
+          margin:{left:14,right:14},
+        });
+        drawFooter(doc.lastAutoTable.finalY+3);
+      }
+      const n=new Date();
+      doc.save(`Rekap_Tidak_Hadir_${(flLem||'Semua').replace(/\s/g,'_')}_${n.toISOString().slice(0,10)}.pdf`);
+    }catch(err){console.error(err);Swal.fire('Error','Terjadi kesalahan saat membuat PDF: '+err.message,'error');}
+  };
+
+  return { exportDaftarHadirRingkas, generateLaporanPDF, exportRekapitulasiPDF, exportRekapKeterlambatan, exportRekapTidakHadir };
 };
 
 const MonitoringExport = ({ presensiData, ijinData, pegawaiData, refreshData, userRole, lembagaData }) => {
@@ -2231,7 +2421,7 @@ const MonitoringExport = ({ presensiData, ijinData, pegawaiData, refreshData, us
   const thisMonth= ()=>{ const n=new Date(); setDStart(new Date(n.getFullYear(),n.getMonth(),1).toISOString().split('T')[0]); setDEnd(new Date(n.getFullYear(),n.getMonth()+1,0).toISOString().split('T')[0]); };
   const clearD   = ()=>{ setDStart(''); setDEnd(''); };
 
-  const { exportDaftarHadirRingkas, generateLaporanPDF, exportRekapitulasiPDF, exportRekapKeterlambatan } = createExportFns({ presensiData, ijinData, pegawaiData, flLem, dStart, dEnd });
+  const { exportDaftarHadirRingkas, generateLaporanPDF, exportRekapitulasiPDF, exportRekapKeterlambatan, exportRekapTidakHadir } = createExportFns({ presensiData, ijinData, pegawaiData, flLem, dStart, dEnd });
 
   const handleReset = async () => {
     const c=await Swal.fire({title:'RESET SEMUA DATA?',text:'Tidak bisa dibatalkan! Unduh laporan dulu.',icon:'warning',showCancelButton:true,confirmButtonColor:'#d33',cancelButtonColor:'#334155',confirmButtonText:'Ya, Reset'});
@@ -2256,6 +2446,7 @@ const MonitoringExport = ({ presensiData, ijinData, pegawaiData, refreshData, us
             {bg:'from-indigo-50 to-indigo-100/40 border-indigo-200',ico:'fa-table text-indigo-600',bg2:'bg-indigo-100',h:'Rekapitulasi PDF',d:'Ringkasan per lembaga: datang, pulang, tidak hadir, terlambat, ijin, sakit, dinas luar.',fn:exportRekapitulasiPDF,btn:'bg-indigo-600 hover:bg-indigo-700',bl:'REKAPITULASI',bi:'fa-table-list'},
             {bg:'from-teal-50 to-teal-100/40 border-teal-200',ico:'fa-calendar-week text-teal-600',bg2:'bg-teal-100',h:'Daftar Hadir Bulanan',d:'Format tabel per lembaga. Kuning=terlambat, Merah=luar radius.',fn:exportDaftarHadirRingkas,btn:'bg-teal-600 hover:bg-teal-700',bl:'DAFTAR HADIR',bi:'fa-list-ul'},
             {bg:'from-orange-50 to-orange-100/40 border-orange-200',ico:'fa-clock text-orange-500',bg2:'bg-orange-100',h:'Rekap Keterlambatan',d:'Akumulasi keterlambatan (kali & menit/jam) dan ketidakhadiran per pegawai per lembaga sesuai filter.',fn:exportRekapKeterlambatan,btn:'bg-orange-500 hover:bg-orange-600',bl:'REKAP TERLAMBAT',bi:'fa-stopwatch'},
+            {bg:'from-red-50 to-red-100/40 border-red-200',ico:'fa-user-slash text-red-600',bg2:'bg-red-100',h:'Rekap Tidak Hadir',d:'Hanya tanggal-tanggal pegawai tidak hadir (Alpa/Sakit/Ijin/Dinas Luar/Cuti) sesuai filter, format detail per tanggal.',fn:exportRekapTidakHadir,btn:'bg-red-600 hover:bg-red-700',bl:'REKAP TDK HADIR',bi:'fa-user-slash'},
           ].map(({bg,ico,bg2,h,d,fn,btn,bl,bi})=>(
             <div key={h} className={`bg-gradient-to-br ${bg} p-5 rounded-2xl border flex flex-col`}>
               <div className={`w-10 h-10 ${bg2} rounded-xl flex items-center justify-center mb-4`}><i className={`fas ${ico} text-sm`}></i></div>
@@ -2276,7 +2467,7 @@ const ArsipData = ({ userRole, username, refreshData, ijinData, pegawaiData }) =
   const [rStart,setRStart]=useState(''), [rEnd,setREnd]=useState('');
   const [daftar,setDaftar]=useState([]), [loading,setLoading]=useState(false), [proses,setProses]=useState(false);
   const [cetakModal,setCetakModal]=useState(null); // baris arsip yang sedang dipilih untuk dicetak
-  const [cetakProses,setCetakProses]=useState(null); // 'rekap' | 'hadir' | 'terlambat' saat sedang diproses
+  const [cetakProses,setCetakProses]=useState(null); // 'rekap' | 'hadir' | 'terlambat' | 'tidakhadir' saat sedang diproses
 
   const canArsip = userRole==='Admin'||userRole==='Superuser';
 
@@ -2346,6 +2537,7 @@ const ArsipData = ({ userRole, username, refreshData, ijinData, pegawaiData }) =
       if(jenis==='rekap') fns.exportRekapitulasiPDF();
       else if(jenis==='hadir') fns.exportDaftarHadirRingkas();
       else if(jenis==='terlambat') fns.exportRekapKeterlambatan();
+      else if(jenis==='tidakhadir') fns.exportRekapTidakHadir();
       setCetakModal(null);
     } catch(e) {
       la.close();
@@ -2507,6 +2699,7 @@ const ArsipData = ({ userRole, username, refreshData, ijinData, pegawaiData }) =
                 <button onClick={()=>handleCetak(cetakModal['Nama Sheet'],'rekap')} disabled={!!cetakProses} className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all"><i className={`fas ${cetakProses==='rekap'?'fa-spinner fa-spin':'fa-table-list'}`}></i>Rekapitulasi PDF</button>
                 <button onClick={()=>handleCetak(cetakModal['Nama Sheet'],'hadir')} disabled={!!cetakProses} className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-60 text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all"><i className={`fas ${cetakProses==='hadir'?'fa-spinner fa-spin':'fa-list-ul'}`}></i>Daftar Hadir Bulanan</button>
                 <button onClick={()=>handleCetak(cetakModal['Nama Sheet'],'terlambat')} disabled={!!cetakProses} className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-60 text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all"><i className={`fas ${cetakProses==='terlambat'?'fa-spinner fa-spin':'fa-stopwatch'}`}></i>Rekap Keterlambatan</button>
+                <button onClick={()=>handleCetak(cetakModal['Nama Sheet'],'tidakhadir')} disabled={!!cetakProses} className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all"><i className={`fas ${cetakProses==='tidakhadir'?'fa-spinner fa-spin':'fa-user-slash'}`}></i>Rekap Tidak Hadir</button>
               </div>
               <button onClick={()=>{ if(!cetakProses) setCetakModal(null); }} disabled={!!cetakProses} className="w-full text-center text-xs font-semibold text-slate-400 hover:text-slate-600 pt-1 disabled:opacity-50">Batal</button>
             </div>
