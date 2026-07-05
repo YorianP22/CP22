@@ -3548,5 +3548,145 @@ const App = () => {
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
+
+<style>
+  #yoriapp-devtools-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999999;
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+  }
+  #yoriapp-devtools-overlay .yoriapp-card {
+    background: #ffffff;
+    border-radius: 16px;
+    max-width: 380px;
+    width: 90%;
+    padding: 28px 24px;
+    text-align: center;
+    box-shadow: 0 20px 45px rgba(0,0,0,0.25);
+    animation: yoriapp-pop .18s ease-out;
+  }
+  @keyframes yoriapp-pop {
+    from { transform: scale(.95); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  #yoriapp-devtools-overlay .yoriapp-icon {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: linear-gradient(135deg,#ef4444,#dc2626);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px auto;
+    color: #fff; font-size: 24px;
+  }
+  #yoriapp-devtools-overlay h2 {
+    margin: 0 0 8px 0; font-size: 17px; color: #0f172a; font-weight: 700;
+  }
+  #yoriapp-devtools-overlay p {
+    margin: 0 0 18px 0; font-size: 13.5px; color: #475569; line-height: 1.6;
+  }
+  #yoriapp-devtools-overlay button {
+    background: linear-gradient(135deg,#2563eb,#1d4ed8);
+    color: #fff; border: none; padding: 10px 22px;
+    border-radius: 8px; font-size: 13.5px; font-weight: 600;
+    cursor: pointer;
+  }
+  #yoriapp-devtools-overlay button:hover { opacity: .92; }
+</style>
+
+<div id="yoriapp-devtools-overlay">
+  <div class="yoriapp-card">
+    <div class="yoriapp-icon"><img src="https://korwilkedunggalar.web.id/yori.png" alt="YoriAPP" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+    <h2 id="yoriapp-overlay-title">Akses Dibatasi</h2>
+    <p id="yoriapp-overlay-message">
+      YoriAPP melarang penggunaan Developer Tools / Inspect Element pada halaman ini
+      demi menjaga keamanan dan integritas data sistem.<br>
+      Silakan tutup panel developer tools untuk melanjutkan.
+    </p>
+    <button onclick="document.getElementById('yoriapp-devtools-overlay').style.display='none'">Saya Mengerti</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var titleEl = document.getElementById('yoriapp-overlay-title');
+  var messageEl = document.getElementById('yoriapp-overlay-message');
+
+  var MSG_DEVTOOLS =
+    'YoriAPP melarang penggunaan Developer Tools / Inspect Element pada halaman ini ' +
+    'demi menjaga keamanan dan integritas data sistem.<br>' +
+    'Silakan tutup panel developer tools untuk melanjutkan.';
+
+  var MSG_RIGHTCLICK =
+    'YoriAPP melarang penggunaan klik kanan (klik kanan mouse) pada halaman ini ' +
+    'demi menjaga keamanan dan integritas data sistem.<br><br>' +
+    'Catatan: fitur salin dan tempel (copy &amp; paste) tetap dapat digunakan ' +
+    'melalui pintasan keyboard <strong>Ctrl+C</strong> / <strong>Ctrl+V</strong>.';
+
+  function showYoriAppBlock(isRightClick) {
+    var overlay = document.getElementById('yoriapp-devtools-overlay');
+    if (!overlay) return;
+    if (titleEl) titleEl.innerHTML = isRightClick ? 'Klik Kanan Dinonaktifkan' : 'Akses Dibatasi';
+    if (messageEl) messageEl.innerHTML = isRightClick ? MSG_RIGHTCLICK : MSG_DEVTOOLS;
+    overlay.style.display = 'flex';
+  }
+
+  // Blokir klik kanan (context menu) -- tampilkan popup, namun copy/paste via keyboard tetap diizinkan
+  document.addEventListener('contextmenu', function (e) {
+    e.preventDefault();
+    showYoriAppBlock(true);
+  });
+
+  // Blokir kombinasi tombol untuk membuka developer tools / view-source
+  document.addEventListener('keydown', function (e) {
+    var key = e.key ? e.key.toUpperCase() : '';
+    var blockCombo =
+      key === 'F12' ||
+      (e.ctrlKey && e.shiftKey && (key === 'I' || key === 'J' || key === 'C')) ||
+      (e.ctrlKey && key === 'U') ||
+      (e.metaKey && e.altKey && (key === 'I' || key === 'J' || key === 'C'));
+
+    if (blockCombo) {
+      e.preventDefault();
+      e.stopPropagation();
+      showYoriAppBlock();
+    }
+  }, true);
+
+  // Deteksi devtools terbuka melalui perbedaan ukuran window (metode threshold)
+  // Interval dipercepat agar popup langsung muncul begitu devtools dibuka lewat menu klik kanan > Inspect
+  var threshold = 160;
+  var devtoolsOpen = false;
+  setInterval(function () {
+    var widthDiff = window.outerWidth - window.innerWidth;
+    var heightDiff = window.outerHeight - window.innerHeight;
+    var isOpen = widthDiff > threshold || heightDiff > threshold;
+
+    if (isOpen && !devtoolsOpen) {
+      devtoolsOpen = true;
+      showYoriAppBlock();
+    } else if (!isOpen && devtoolsOpen) {
+      devtoolsOpen = false;
+    }
+  }, 200);
+
+  // Deteksi tambahan: trik console timing (mendeteksi devtools yang di-undock/terpisah)
+  var consoleCheckActive = true;
+  (function consoleTimingCheck() {
+    if (!consoleCheckActive) return;
+    var start = new Date().getTime();
+    // eslint-disable-next-line no-debugger
+    debugger;
+    var end = new Date().getTime();
+    if (end - start > 100) {
+      showYoriAppBlock();
+    }
+    setTimeout(consoleTimingCheck, 500);
+  })();
+})();
+</script>
 </body>
 </html>
